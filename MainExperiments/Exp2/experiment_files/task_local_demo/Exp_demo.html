@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Demo Exp</title>
+    <script src="jspsych/jspsych.js"></script>
+    <script src="jspsych/plugin-html-button-response.js"></script>
+    <script src="jspsych/plugin-survey-multi-choice.js"></script>
+    <script src="jspsych/plugin-survey-likert.js"></script>
+    <script src="jspsych/plugin-html-slider-response.js"></script>
+	<script src="jspsych/plugin-image-keyboard-response.js"></script>
+	<script src="jspsych/plugin-html-keyboard-response.js"></script>
+    <script src="jspsych/plugin-preload.js"></script>
+    <script src="jspsych/plugin-survey-text.js"></script>
+    <link href="jspsych/jspsych.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body></body>
+  <script>
+  
+// run study with ?demo=true at the end of url to have the demo mode
+
+
+var jsPsych = initJsPsych({
+  experiment_width: 1000,
+  on_finish: function(){
+    window.location = "https://app.prolific.co/submissions/complete?cc=136BDB5F"
+  }
+});
+
+
+//var condition = CONDITION; 
+var condition;
+
+jsPsych.data.addProperties({condition: condition});
+
+var subj_code;
+
+function makeid(length) {
+    var result           = '';
+    var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var charactersLength = characters.length;
+    for ( var i = 0; i < length; i++ ) {
+      result += characters.charAt(Math.floor(Math.random() * 
+ charactersLength));
+   }
+   return result;
+}
+
+subj_code = makeid(12);
+
+console.log(subj_code);
+
+jsPsych.data.addProperties({subj_code: subj_code});
+
+
+
+/* create timeline */
+var timeline = [];
+
+/* preload images */
+var preload = {
+  type: jsPsychPreload,
+  images: ['img/uni_org_color_li.png']
+}
+timeline.push(preload);
+
+var styles = `
+  p {
+    text-align: justify
+  }
+  
+`
+var styleSheet = document.createElement("style")
+styleSheet.type = "text/css"
+styleSheet.innerText = styles
+document.head.appendChild(styleSheet)
+
+
+//////////////////////// experiment-specific variables
+
+console.log(condition)
+
+var i = 0;
+
+var features;
+var latent_var;
+
+var likert_scale; 
+var scale_orientation;
+
+var scenario;
+var query;
+var valence;
+
+
+//////////////////////////////////////////////////////
+/* Condition selection (just for offline demo) */
+
+var select = {
+  type: jsPsychSurveyText,
+  questions: [
+    {
+		prompt: 
+		`
+		<p><b>This study is in demo mode. Select a condition: type in a number between 1 and 8.</b></p>
+    <p>
+      - 1 - 2: probability query and negative effects<br>
+      - 3 - 4: probability query and positive effects<br>
+      - 5 - 6: satisfation query and negative effects<br>
+      - 7 - 8: satisfaction query and positive effects<br>
+    </p>
+		`, 
+		placeholder: 'number between 1 and 8',
+		required: true,
+		name: 'CondSel',
+	},
+  ],
+	on_finish: function(data){
+	condition = data.response.CondSel,
+	console.log(condition);
+	} 
+}
+//timeline.push(select);
+
+
+
+//////////////////////////////////////////////////////
+/* Instructions ( all conditions)  */
+var cond_selected = {
+    type: jsPsychHtmlButtonResponse,
+    stimulus: function () {
+    return "You chose to see Condition "+condition;
+		},
+    choices: ['Continue']
+};
+timeline.push(select, cond_selected);
+
+
+
+//////////////////////////////////////////////////////// negative v.s. positive outcome vignettes
+
+
+scenario_negative_Bic_Taw = `
+<p>You are a medical researcher investigating people with certain dangerous physiological alterations that reduce a person's life expectancy. 
+  These problems are caused by two different gene mutations, (1) Mut-Bic2 and (2) Mut-Taw4.</p>
+
+<p>- Mut-Bic2 always causes abnormal <b>Gludon</b> blood levels.<p>
+<p>- Mut-Taw4 always causes abnormal <b>Gludon</b> blood levels and abnormal <b>Lian</b> blood levels.</p>
+
+<p>A study with 200 participants found that 10 of them had abnormal <b>Lian</b> blood levels (i.e., <b>5%</b>). 
+  It is also known that Mut-Bic2 and Mut-Taw4 are <b>equally likely to occur in a person</b>. 
+  That means, the number of people in the general population who have Mut-Bic2 is the same as the number of people who have Mut-Taw4.</p>
+`;
+
+scenario_negative_Taw_Bic = `
+<p>You are a medical researcher investigating people with certain dangerous physiological alterations that reduce a person's life expectancy. 
+  These problems are caused by two different gene mutations, (1) Mut-Taw4 and (2) Mut-Bic2.</p>
+
+  <p>- Mut-Taw4 always causes abnormal <b>Gludon</b> blood levels and abnormal <b>Lian</b> blood levels.</p>
+  <p>- Mut-Bic2 always causes abnormal <b>Gludon</b> blood levels.<p>
+
+<p>A study with 200 participants found that 10 of them had abnormal <b>Lian</b> blood levels (i.e., <b>5%</b>). 
+  It is also known that Mut-Taw4 and Mut-Bic2 are <b>equally likely to occur in a person</b>. 
+  That means, the number of people in the general population who have Mut-Taw4 is the same as the number of people who have Mut-Bic2.</p>
+`;
+
+
+scenario_positive_Bic_Taw = `
+<p>You are a medical researcher investigating people with certain beneficial physiological alterations that increase a person's life expectancy. 
+  These improvements are caused by two different gene mutations, (1) Mut-Bic2 and (2) Mut-Taw4.</p>
+
+<p>- Mut-Bic2 always causes healthy <b>Gludon</b> blood levels.<p>
+<p>- Mut-Taw4 always causes healthy <b>Gludon</b> blood levels and healthy <b>Lian</b> blood levels.</p>
+
+<p>A study with 200 participants found that 10 of them had healthy <b>Lian</b> blood levels (i.e., <b>5%</b>). 
+  It is also known that Mut-Bic2 and Mut-Taw4 are <b>equally likely to occur in a person</b>. 
+  That means, the number of people in the general population who have Mut-Bic2 is the same as the number of people who have Mut-Taw4.</p>
+`;
+
+
+scenario_positive_Taw_Bic = `
+<p>You are a medical researcher investigating people with certain beneficial physiological alterations that increase a person's life expectancy. 
+  These improvements are caused by two different gene mutations, (1) Mut-Taw4 and (2) Mut-Bic2.</p>
+
+<p>- Mut-Taw4 always causes healthy <b>Gludon</b> blood levels and healthy <b>Lian</b> blood levels.</p>
+<p>- Mut-Bic2 always causes healthy <b>Gludon</b> blood levels.<p>
+
+<p>A study with 200 participants found that 10 of them had healthy <b>Lian</b> blood levels (i.e., <b>5%</b>). 
+  It is also known that Mut-Taw4 and Mut-Bic2 are <b>equally likely to occur in a person</b>. 
+  That means, the number of people in the general population who have Mut-Taw4 is the same as the number of people who have Mut-Bic2.</p>
+`;
+
+
+
+
+
+
+
+//////////////////////////////////////////////////////
+/* Confirmations */
+var confs = {
+  type: jsPsychSurveyMultiChoice,
+  questions: [
+    {
+      prompt: "This study works properly only on Desktop PCs and Laptops, and not on Smartphones or Tablets. Before you proceed, please confirm that you take part via Desktop PC or Laptop.", 
+      name: 'DesktopConf', 
+      options: ['1: I confirm', '2: I do not confirm'], 
+      required: true
+    }, 
+    {
+      prompt: "For the scientific utility of the results, it is very important that you provide complete and careful responses. How seriously will you take your participation in the study?", 
+      name: 'AttentConf', 
+      options: ['1: I will take it seriously', '2: I will not take it seriously'], 
+      required: true
+    }, 
+  ],
+  on_finish: function(data){
+    if (condition == 1) {
+        scenario = scenario_negative_Bic_Taw;
+        likert_scale = ["Definitely Mut-Bic2", " ", " ", " ", " ", "Both equally likely", " ", " ", " ", " ", "Definitely Mut-Taw4"];
+        scale_orientation = "narrow_left";
+        query = "probability";
+        valence = "negative";
+      } else if (condition == 2) {
+        scenario = scenario_negative_Taw_Bic;
+        likert_scale = ["Definitely Mut-Taw4", " ", " ", " ", " ", "Both equally likely", " ", " ", " ", " ", "Definitely Mut-Bic2"];
+        scale_orientation = "narrow_right";
+        query = "probability";
+        valence = "negative";
+      } else if (condition == 3) {
+        scenario = scenario_positive_Bic_Taw;
+        likert_scale = ["Definitely Mut-Bic2", " ", " ", " ", " ", "Both equally likely", " ", " ", " ", " ", "Definitely Mut-Taw4"];
+        scale_orientation = "narrow_left";
+        query = "probability";
+        valence = "positive";
+      } else if (condition == 4) {
+        scenario = scenario_positive_Taw_Bic;
+        likert_scale = ["Definitely Mut-Taw4", " ", " ", " ", " ", "Both equally likely", " ", " ", " ", " ", "Definitely Mut-Bic2"];
+        scale_orientation = "narrow_right";
+        query = "probability";
+        valence = "positive";
+      } else if (condition == 5) {
+        scenario = scenario_negative_Bic_Taw;
+        likert_scale = ["Definitely Mut-Bic2", " ", " ", " ", " ", "Both equally satisfying", " ", " ", " ", " ", "Definitely Mut-Taw4"];
+        scale_orientation = "narrow_left";
+        query = "satisfaction";
+        valence = "negative";
+      } else if (condition == 6) {
+        scenario = scenario_negative_Taw_Bic;
+        likert_scale = ["Definitely Mut-Taw4", " ", " ", " ", " ", "Both equally satisfying", " ", " ", " ", " ", "Definitely Mut-Bic2"];
+        scale_orientation = "narrow_right";
+        query = "satisfaction";
+        valence = "negative";
+      } else if (condition == 7) {
+        scenario = scenario_positive_Bic_Taw;
+        likert_scale = ["Definitely Mut-Bic2", " ", " ", " ", " ", "Both equally satisfying", " ", " ", " ", " ", "Definitely Mut-Taw4"];
+        scale_orientation = "narrow_left";
+        query = "satisfaction";
+        valence = "positive";
+      } else if (condition == 8) {
+        scenario = scenario_positive_Taw_Bic;
+        likert_scale = ["Definitely Mut-Taw4", " ", " ", " ", " ", "Both equally satisfying", " ", " ", " ", " ", "Definitely Mut-Bic2"];
+        scale_orientation = "narrow_right";
+        query = "satisfaction";
+        valence = "positive";
+      };
+	  jsPsych.data.addProperties({desktop_conf: data.response.DesktopConf, attent_conf: data.response.AttentConf, scale_orient: scale_orientation});
+  },
+  preamble: `
+              <p><img src="img/uni_org_color_li.png" width = 100%></img></p>
+              <p><b>Welcome to this experiment and thank you very much for your participation.</b></p>
+              <p>Please note: This study contains memory and comprehension checks with which we aim to ensure that you correctly understood the central aspects of the study.</p>
+            `
+};
+timeline.push(confs);
+
+
+
+///////////////////////////////////
+/* Scenario */
+
+var scenario = {
+  type: jsPsychHtmlButtonResponse,
+  stimulus: 
+  function() {return `
+        <p><i>Please read the following fictitious scenario thoroughly. We'll probe your understanding of the scenario on a subsequent screen:</i></p>
+
+        `+scenario+`
+  `
+  },
+    choices: ['Continue']
+}
+timeline.push(scenario);
+
+
+
+
+
+
+//////////////////
+/* instr */ 
+var instr_check = {
+  type: jsPsychSurveyMultiChoice,
+  name: 'instr_check',
+  questions: [
+    {
+      prompt: function () {return `<b>What is correct about the effects of the mutations?</b>`}, 
+      options: ['1: Mut-Bic2 changes Gludon blood levels and Mut-Taw4 changes Gludon and Lian blood levels.', 
+                '2: Mut-Bic2 changes Gludon and Lian blood levels and Mut-Taw4 changes Gludon blood levels.'],
+      required: true,
+      name: 'scope_check'
+    },
+    {
+      prompt: "<b>What is correct about the prevalence of changed Lian levels?</b>", 
+      options: ['1: A study found that 10 out of 200 people have changed Lian blood levels.', 
+                '2: A study found that 190 out of 200 people have changed Lian blood levels.',
+              ],
+      required: true,
+      name: 'broad_rate_check'
+    },
+    {
+      prompt: function () {return `<b>What is correct about the prevalence of the two mutations?</b>`}, 
+      options: ['1: One of them occurs more often in the general population than the other.', 
+                '2: Mut-Bic2 and Mut-Taw4 occur equally often in the general population.'],
+      required: true,
+      name: 'rate_check'
+    },
+    {
+      prompt: function () {return `<b>What is correct about the influence on life expectancy that changed blood levels of the substances have?</b>`}, 
+      options: [`1: The mutations' influence on Gludon and Lian blood levels is beneficial as it increases a person's life expectancy.`, 
+                `2: The mutations' influence on Gludon and Lian blood levels is detrimental as it reduces a person's life expectancy.`],
+      required: true,
+      name: 'valence_check'
+    },
+  ],
+
+  preamble: function() {return `
+      <p><i>You have now learned the relevant information about the two gene mutations. 
+        Before you can proceed, we need to ensure that you understood the relevant aspects correctly. 
+        Please answer the comprehension check questions below.</i></p>
+    `
+  },
+  on_finish: function(data){
+    i ++;
+    console.log("instr test rounds: "+i);
+    if (valence == "positive" &
+        data.response.scope_check == '1: Mut-Bic2 changes Gludon blood levels and Mut-Taw4 changes Gludon and Lian blood levels.' &
+        data.response.broad_rate_check == '1: A study found that 10 out of 200 people have changed Lian blood levels.' &
+        data.response.rate_check == '2: Mut-Bic2 and Mut-Taw4 occur equally often in the general population.' &
+        data.response.valence_check == `1: The mutations' influence on Gludon and Lian blood levels is beneficial as it increases a person's life expectancy.`) {
+        instr_check = "correct";
+    } else if (valence == "negative" &
+        data.response.scope_check == '1: Mut-Bic2 changes Gludon blood levels and Mut-Taw4 changes Gludon and Lian blood levels.' &
+        data.response.broad_rate_check == '1: A study found that 10 out of 200 people have changed Lian blood levels.' &
+        data.response.rate_check == '2: Mut-Bic2 and Mut-Taw4 occur equally often in the general population.' &
+        data.response.valence_check == `2: The mutations' influence on Gludon and Lian blood levels is detrimental as it reduces a person's life expectancy.`) { 
+        instr_check = "correct";
+    } else {
+      instr_check = "incorrect";
+    };
+    console.log("result instruction check: "+instr_check);
+	  jsPsych.data.addProperties({instr_tests: i});
+  },
+};
+timeline.push(instr_check);
+
+
+
+// screen if instr check was failed 
+var instr_check_failed = {
+  type: jsPsychHtmlButtonResponse,
+  stimulus: 
+    `
+    <p><b>Unfortunately, you did NOT answer all comprehension check questions correctly. We will therefore show you the instructions again.</b></p>
+    
+    <p>Please click the button below to read the instruction again and repeat the test.</p>
+    `
+    ,
+    choices: ['Back to instructions']
+}
+
+
+var loop_node = {
+    timeline: [instr_check_failed, scenario, instr_check],
+    loop_function: function(data){
+        if(instr_check == "incorrect"){
+            return true;
+        } else {
+            return false;
+        }
+    }
+}
+
+var if_node = {
+    timeline: [loop_node],
+    conditional_function: function(){
+        if(instr_check == "incorrect"){
+            return true;
+        } else {
+            return false;
+        }
+    }
+}
+timeline.push(if_node); // note: the if_node evaluates the status of the instruction test variable and, given that it has value "incorrect", triggers the loop node
+
+
+// screen if instr check was passed
+var instr_check_passed = {
+  type: jsPsychHtmlButtonResponse,
+  stimulus: 
+    `
+    <p><b>You answered all comprehension check questions CORRECTLY and can proceed.</b></p>
+    
+    <p>Please click the button below to continue.</p>
+    `
+    ,
+    choices: ['Continue']
+}
+timeline.push(instr_check_passed);
+
+
+
+
+
+
+////////////////////////////// Instructing the Decision Situation 
+
+var prob_negative = {
+  type: jsPsychSurveyLikert,
+  questions: [
+    {prompt: function() {return `<b>Which of the two possible mutations is the most probable cause of the physiological condition of Patient #53?</b>`}, 
+    name: 'rating', 
+    required: true,
+    labels: function () {return likert_scale}},
+  ],
+  randomize_question_order: false,
+  preamble: function() {
+    return `                 
+        <p><i>Now consider the following situation and then answer the test question below:</i></p>
+
+        <p>Patient #53 has either Mut-Bic2 (which causes abnormal Gludon levels) or Mut-Taw4 (which causes abnormal Gludon and abnormal Lian levels). 
+          The patient has already been found to have abnormal Gludon blood levels, but we don't know yet whether or not the patient also has abnormal Lian blood levels.</p>
+    `
+  },
+  on_finish: function(data){
+	  jsPsych.data.addProperties({DV_rating: data.response.rating});
+  },
+};
+
+var prob_positive = {
+  type: jsPsychSurveyLikert,
+  questions: [
+    {prompt: function() {return `<b>Which of the two possible mutations is the most probable cause of the physiological condition of Patient #53?</b>`}, 
+    name: 'rating', 
+    required: true,
+    labels: function () {return likert_scale}},
+  ],
+  randomize_question_order: false,
+  preamble: function() {
+    return `                 
+        <p><i>Now consider the following situation and then answer the test question below:</i></p>
+
+        <p>Patient #53 has either Mut-Bic2 (which causes healthy Gludon levels) or Mut-Taw4 (which causes healthy Gludon and healthy Lian levels). 
+          The patient has already been found to have healthy Gludon blood levels, but we don't know yet whether or not the patient also has healthy Lian blood levels.</p>
+    `
+  },
+  on_finish: function(data){
+	  jsPsych.data.addProperties({DV_rating: data.response.rating});
+  },
+};
+
+var sat_negative = {
+  type: jsPsychSurveyLikert,
+  questions: [
+    {prompt: function() {return `<b>Which of the two possible mutations would be the most satisfying explanation for the physiological condition of Patient #53?</b>`}, 
+    name: 'rating', 
+    required: true,
+    labels: function () {return likert_scale}},
+  ],
+  randomize_question_order: false,
+  preamble: function() {
+    return `                 
+        <p><i>Now consider the following situation and then answer the test question below:</i></p>
+
+        <p>Patient #53 has either Mut-Bic2 (which causes abnormal Gludon levels) or Mut-Taw4 (which causes abnormal Gludon and abnormal Lian levels). 
+          The patient has already been found to have abnormal Gludon blood levels, but we don't know yet whether or not the patient also has abnormal Lian blood levels.</p>
+    `
+  },
+  on_finish: function(data){
+	  jsPsych.data.addProperties({DV_rating: data.response.rating});
+  },
+};
+
+var sat_positive = {
+  type: jsPsychSurveyLikert,
+  questions: [
+    {prompt: function() {return `<b>Which of the two possible mutations would be the most satisfying explanation for the physiological condition of Patient #53?</b>`}, 
+    name: 'rating', 
+    required: true,
+    labels: function () {return likert_scale}},
+  ],
+  randomize_question_order: false,
+  preamble: function() {
+    return `                 
+        <p><i>Now consider the following situation and then answer the test question below:</i></p>
+
+        <p>Patient #53 has either Mut-Bic2 (which causes healthy Gludon levels) or Mut-Taw4 (which causes healthy Gludon and healthy Lian levels). 
+          The patient has already been found to have healthy Gludon blood levels, but we don't know yet whether or not the patient also has healthy Lian blood levels.</p>
+    `
+  },
+  on_finish: function(data){
+	  jsPsych.data.addProperties({DV_rating: data.response.rating});
+  },
+};
+
+
+var cond_prob_neg = {
+  timeline: [prob_negative],
+  conditional_function: function () {
+    if (condition <= 2) {
+      return true; 
+    } else {
+      return false;
+    }
+  }
+}
+
+var cond_prob_pos = {
+  timeline: [prob_positive],
+  conditional_function: function () {
+    if (condition >= 3 && condition <= 4) {
+      return true; 
+    } else {
+      return false;
+    }
+  }
+}
+
+var cond_sat_neg = {
+  timeline: [sat_negative],
+  conditional_function: function () {
+    if (condition >= 5 && condition <= 6) {
+      return true; 
+    } else {
+      return false;
+    }
+  }
+}
+
+var cond_sat_pos = {
+  timeline: [sat_positive],
+  conditional_function: function () {
+    if (condition >= 7) {
+      return true; 
+    } else {
+      return false;
+    }
+  }
+}
+
+timeline.push(cond_prob_neg, cond_prob_pos, cond_sat_neg, cond_sat_pos);
+
+
+
+/////////////////////////////////////// explanation
+var explan = {
+  type: jsPsychSurveyText,
+  name: 'Free_explan',
+  questions: [
+    {prompt: `We'd now like to learn a little bit more about the rating you've just made. Please use the text field below to write a short explanation of your rating.`, 
+    rows: 10, 
+    columns: 100, 
+    required: true,
+    name: 'Explanation'
+    },
+  ],
+  on_finish: function(data){
+	  jsPsych.data.addProperties({explanation: data.response.Explanation});
+  },
+}
+timeline.push(explan);
+
+
+
+
+/////////////////////////////////////// demographics
+var demogr_age = {
+  type: jsPsychSurveyText,
+  name: 'Age_query',
+  questions: [
+    {prompt: 'How old are you?', 
+    placeholder: 'Age as a number', 
+    required: true,
+    name: 'Age'
+    },
+  ],
+  on_finish: function(data){
+	  jsPsych.data.addProperties({age: data.response.Age});
+  },
+}
+
+
+
+var demogr_gender = {
+  type: jsPsychSurveyMultiChoice,
+  name: 'gender_query',
+  questions: [
+    {
+      prompt: "Please indicate with which gender you identify.", 
+      options: ['1: male', '2: female', '3: non-binary', '4: prefer not to say'],
+      required: true,
+      name: 'Gender'
+    },
+  ],
+  on_finish: function(data){
+	  jsPsych.data.addProperties({gender: data.response.Gender});
+  },
+};
+timeline.push(demogr_age, demogr_gender);
+
+
+
+
+/////////////////////////////////////// technical issues
+var tech_issues = {
+  type: jsPsychSurveyText,
+  name: 'Tech_issue_query',
+  questions: [
+    {prompt: 'In the text field below you can report any errors that you came across during the study (e.g., technical issues, layout problems, spelling errors, errors in program logic and flow, etc.).', 
+    rows: 10, 
+    columns: 100, 
+    required: false,
+    name: 'Tech_issue_report'
+    },
+  ],
+  on_finish: function(data){
+	  jsPsych.data.addProperties({tech_issues: data.response.Tech_issue_report});
+	  console.log(data.response.Tech_issue_report)
+  },
+}
+timeline.push(tech_issues);
+
+///////////////////////////////////// debriefing
+
+var debriefing = {
+  type: jsPsychHtmlButtonResponse,
+  stimulus: 
+    `
+    <img src="img/uni_org_color_li.png" width = 100%></img>
+    <p><b>Thank you for taking part in this study!</b></p>
+  
+    <p>The aim of this experiment is to find out more about how people form explanations. 
+    If you are interested in further details or if you have any questions or comments concerning the experiment, 
+    feel free to contact me (ANONYMIZED RESEARCHER) under <i>ANONYMIZED E-MAIL</i>
+    
+    <p>To ensure you receive your reward, please click the button below to return to the Prolific website:</p>
+    `
+    ,
+    choices: ['Finish study']
+};
+timeline.push(debriefing);
+
+
+
+/////////////////////////////////////////////////////////////////
+/* start the experiment */
+    jsPsych.run(timeline);
+
+  
+  </script>
+</html>

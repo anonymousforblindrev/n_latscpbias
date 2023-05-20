@@ -1,0 +1,9 @@
+condition 	features	latent_info	scale orientation 
+1	spearNet	no knowledge	broad left 
+2	spearNet	no knowledge	broad right 
+3	spearNet	no info 	broad left 
+4	spearNet	no info 	broad rigth 
+5	featherTooth	no knowledge	broad left 
+6	featherTooth	no knowledge	broad right 
+7	featherTooth	no info 	broad left 
+8	featherTooth	no info 	broad rigth 

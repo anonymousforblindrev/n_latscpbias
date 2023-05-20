@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Demo Exp</title>
+    <script src="jspsych/jspsych.js"></script>
+    <script src="jspsych/plugin-html-button-response.js"></script>
+    <script src="jspsych/plugin-survey-multi-choice.js"></script>
+    <script src="jspsych/plugin-survey-likert.js"></script>
+    <script src="jspsych/plugin-html-slider-response.js"></script>
+	<script src="jspsych/plugin-image-keyboard-response.js"></script>
+	<script src="jspsych/plugin-html-keyboard-response.js"></script>
+    <script src="jspsych/plugin-preload.js"></script>
+    <script src="jspsych/plugin-survey-text.js"></script>
+    <link href="jspsych/jspsych.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body></body>
+  <script>
+  
+// run study with ?demo=true at the end of url to have the demo mode
+
+
+var jsPsych = initJsPsych({
+  experiment_width: 1000,
+  on_finish: function(){
+    window.location = "https://app.prolific.co/submissions/complete?cc=136BDB5F"
+  }
+});
+
+
+//var condition = CONDITION; 
+var condition;
+
+jsPsych.data.addProperties({condition_1: condition});
+
+var subj_code;
+
+function makeid(length) {
+    var result           = '';
+    var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var charactersLength = characters.length;
+    for ( var i = 0; i < length; i++ ) {
+      result += characters.charAt(Math.floor(Math.random() * 
+ charactersLength));
+   }
+   return result;
+}
+
+subj_code = makeid(12);
+
+console.log(subj_code);
+
+jsPsych.data.addProperties({subj_code: subj_code});
+
+
+
+/* create timeline */
+var timeline = [];
+
+/* preload images */
+var preload = {
+  type: jsPsychPreload,
+  images: ['img/uni_org_color_li.png']
+}
+timeline.push(preload);
+
+var styles = `
+  p {
+    text-align: justify
+  }
+  
+`
+var styleSheet = document.createElement("style")
+styleSheet.type = "text/css"
+styleSheet.innerText = styles
+document.head.appendChild(styleSheet)
+
+
+//////////////////////// experiment-specific variables
+
+console.log(condition)
+
+var i = 0;
+
+var features;
+var latent_var;
+
+var likert_scale; 
+var scale_orientation;
+
+var scenario;
+
+
+
+
+//////////////////////////////////////////////////////
+/* Condition selection (just for offline demo) */
+
+var select = {
+  type: jsPsychSurveyText,
+  questions: [
+    {
+		prompt: 
+		`
+		<p><b>This study is in demo mode. Select a condition: type in a number between 1 and 8.</b></p>
+    <p>
+      - 1 - 2: spear and net; "you don't know" (1 and 2 codes orientation of rating scale)<br>
+      - 3 - 4: spear and net; no info about latent feature<br>
+      - 5 - 6: feathers and tooth; "you don't know"<br>
+      - 7 - 8: feathers and tooth; no info about latent feature<br>
+    </p>
+		`, 
+		placeholder: 'number between 1 and 8',
+		required: true,
+		name: 'CondSel',
+	},
+  ],
+	on_finish: function(data){
+	condition = data.response.CondSel,
+	console.log(condition);
+	} 
+}
+//timeline.push(select);
+
+
+
+//////////////////////////////////////////////////////
+/* Instructions ( all conditions)  */
+var cond_selected = {
+    type: jsPsychHtmlButtonResponse,
+    stimulus: function () {
+    return "You chose to see Condition "+condition;
+		},
+    choices: ['Continue']
+};
+timeline.push(select, cond_selected);
+
+
+
+
+
+
+//////////////////////////////////////////////////////
+/* Confirmations */
+var confs = {
+  type: jsPsychSurveyMultiChoice,
+  questions: [
+    {
+      prompt: "This study works properly only on Desktop PCs and Laptops, and not on Smartphones or Tablets. Before you proceed, please confirm that you take part via Desktop PC or Laptop.", 
+      name: 'DesktopConf', 
+      options: ['1: I confirm', '2: I do not confirm'], 
+      required: true
+    }, 
+    {
+      prompt: "For the scientific utility of the results, it is very important that you provide complete and careful responses. How seriously will you take your participation in the study?", 
+      name: 'AttentConf', 
+      options: ['1: I will take it seriously', '2: I will not take it seriously'], 
+      required: true
+    }, 
+  ],
+  on_finish: function(data){
+    if (condition == 1 || condition == 3 || condition == 5 || condition == 7) {
+        likert_scale = ["Definitely a hunter", " ", " ", " ", " ", "50:50 (both equally likely)", " ", " ", " ", " ", "Definitely a fisherman"];
+        scale_orientation = "narrow_left";
+      } else if (condition == 2 || condition == 4 || condition == 6 || condition == 8) {
+        likert_scale = ["Definitely a fisherman", " ", " ", " ", " ", "50:50 (both equally likely)", " ", " ", " ", " ", "Definitely a hunter"];
+        scale_orientation = "narrow_right";
+      };
+	  jsPsych.data.addProperties({desktop_conf: data.response.DesktopConf, attent_conf: data.response.AttentConf, scale_orient: scale_orientation});
+  },
+  preamble: `
+              <p><img src="img/uni_org_color_li.png" width = 100%></img></p>
+              <p><b>Welcome to this experiment and thank you very much for your participation.</b></p>
+              <p>Please note: This study contains memory and comprehension checks with which we aim to ensure that you correctly understood the central aspects of the study.</p>
+            `
+};
+timeline.push(confs);
+
+
+
+
+
+////////////////////////////// Instructing the Decision Situation 
+
+var spearNet_notKnow = {
+  type: jsPsychSurveyLikert,
+  questions: [
+    {prompt: function() {return `<b>To which category of Tokolo tribe member do you think this tribesman belongs to?`}, 
+    name: 'rating', 
+    labels: function () {return likert_scale}},
+  ],
+  randomize_question_order: false,
+  preamble: function() {
+    return `                 
+        <p><i>Please read the following (fictitious) scenario thoroughly and then answer the question below:</i></p>
+
+        <p>In the jungles of the Amazon half of the Tokolo tribe members are hunters, and the other half are spear fishermen. 
+          Both hunters and spear fisherman carry spears, but spear fisherman also carry nets. </p>
+
+        <p>You come across a tribesman who has a spear, but you don't know whether or not he also has a net.</p>
+    `
+  },
+  on_finish: function(data){
+    scenario = "spearNet_notKnow";
+	  jsPsych.data.addProperties({DV_rating: data.response.rating, Scenario: scenario});
+  },
+};
+
+var spearNet_noInfo = {
+  type: jsPsychSurveyLikert,
+  questions: [
+    {prompt: function() {return `<b>To which category of Tokolo tribe member do you think this tribesman belongs to?`}, 
+    name: 'rating', 
+    labels: function () {return likert_scale}},
+  ],
+  randomize_question_order: false,
+  preamble: function() {
+    return `                 
+        <p><i>Please read the following (fictitious) scenario thoroughly and then answer the question below:</i></p>
+
+        <p>In the jungles of the Amazon half of the Tokolo tribe members are hunters, and the other half are spear fishermen. 
+          Both hunters and spear fisherman carry spears, but spear fisherman also carry nets. </p>
+
+        <p>You come across a tribesman who has a spear.</p>
+    `
+  },
+  on_finish: function(data){
+    scenario = "spearNet_noInfo";
+	  jsPsych.data.addProperties({DV_rating: data.response.rating, Scenario: scenario});
+  },
+};
+
+var featherTooth_notKnow = {
+  type: jsPsychSurveyLikert,
+  questions: [
+    {prompt: function() {return `<b>To which category of Tokolo tribe member do you think this tribesman belongs to?`}, 
+    name: 'rating', 
+    labels: function () {return likert_scale}},
+  ],
+  randomize_question_order: false,
+  preamble: function() {
+    return `                 
+        <p><i>Please read the following (fictitious) scenario thoroughly and then answer the question below:</i></p>
+
+        <p>In the jungles of the Amazon half of the Tokolo tribe members are hunters, and the other half are spear fishermen. 
+          Both hunters and spear fisherman wear colorful feathered headdresses, but spear fisherman also have one golden molar tooth. </p>
+
+        <p>You come across a tribesman who wears a colorful feathered headdress, but you don't know whether or not he also has a golden molar tooth.</p>
+    `
+  },
+  on_finish: function(data){
+    scenario = "featherTooth_notKnow";
+	  jsPsych.data.addProperties({DV_rating: data.response.rating, Scenario: scenario});
+  },
+};
+
+var featherTooth_noInfo = {
+  type: jsPsychSurveyLikert,
+  questions: [
+    {prompt: function() {return `<b>To which category of Tokolo tribe member do you think this tribesman belongs to?`}, 
+    name: 'rating', 
+    labels: function () {return likert_scale}},
+  ],
+  randomize_question_order: false,
+  preamble: function() {
+    return `                 
+        <p><i>Please read the following (fictitious) scenario thoroughly and then answer the question below:</i></p>
+
+        <p>In the jungles of the Amazon half of the Tokolo tribe members are hunters, and the other half are spear fishermen. 
+          Both hunters and spear fisherman wear colorful feathered headdresses, but spear fisherman also have one golden molar tooth. </p>
+
+        <p>You come across a tribesman who wears a colorful feathered headdress.</p>
+    `
+  },
+  on_finish: function(data){
+    scenario = "featherTooth_noInfo";
+	  jsPsych.data.addProperties({DV_rating: data.response.rating, Scenario: scenario});
+  },
+};
+
+
+
+var net_notKnow = {
+  timeline: [spearNet_notKnow],
+  conditional_function: function () {
+    if (condition <= 2) {
+      return true; 
+    } else {
+      return false;
+    }
+  }
+}
+
+var net_noInfo = {
+  timeline: [spearNet_noInfo],
+  conditional_function: function () {
+    if (condition >= 3 && condition <= 4) {
+      return true; 
+    } else {
+      return false;
+    }
+  }
+}
+
+var tooth_notKnow = {
+  timeline: [featherTooth_notKnow],
+  conditional_function: function () {
+    if (condition >= 5 && condition <= 6) {
+      return true; 
+    } else {
+      return false;
+    }
+  }
+}
+
+var tooth_noInfo = {
+  timeline: [featherTooth_noInfo],
+  conditional_function: function () {
+    if (condition >= 7) {
+      return true; 
+    } else {
+      return false;
+    }
+  }
+}
+
+timeline.push(net_notKnow, net_noInfo, tooth_notKnow, tooth_noInfo);
+
+
+
+/////////////////////////////////////// explanation
+var explan = {
+  type: jsPsychSurveyText,
+  name: 'Free_explan',
+  questions: [
+    {prompt: `We'd now like to learn a little bit more about the rating you've just made. Please use the text field below to write a short explanation of your rating.`, 
+    rows: 10, 
+    columns: 100, 
+    required: true,
+    name: 'Explanation'
+    },
+  ],
+  on_finish: function(data){
+	  jsPsych.data.addProperties({explanation: data.response.Explanation});
+  },
+}
+timeline.push(explan);
+
+
+//////////////////
+/* memory checks */ 
+var mem_check = {
+  type: jsPsychSurveyMultiChoice,
+  name: 'memory_check',
+  questions: [
+    {
+      prompt: "What are the defining features of hunters according to the scenario you've read?", 
+      options: ['1: They carry a spear and a net.',
+                '2: They carry only a spear.', 
+                '3: They wear a feathered headdress and have a golden molar tooth.', 
+                '4: They only wear a feathered headdress.'],
+      required: true,
+      name: 'narrow_check'
+    },
+    {
+      prompt: "What are the defining features of fishermen according to the scenario you've read?", 
+      options: ['1: They carry a spear and a net.',
+                '2: They carry only a spear.', 
+                '3: They wear a feathered headdress and have a golden molar tooth.', 
+                '4: They only wear a feathered headdress.'],
+      required: true,
+      name: 'broad_check'
+    },
+  ],
+  preamble: function() {return `
+    <p>Thank you for your description. Before you finish the experiment, please answer the following memory check questions.</p>
+    `
+  },
+  on_finish: function(data){
+	  jsPsych.data.addProperties({narrow_check: data.response.narrow_check, broad_check: data.response.broad_check});
+  },
+};
+timeline.push(mem_check);
+
+
+
+/////////////////////////////////////// demographics
+var demogr_age = {
+  type: jsPsychSurveyText,
+  name: 'Age_query',
+  questions: [
+    {prompt: 'How old are you?', 
+    placeholder: 'Age as a number', 
+    required: true,
+    name: 'Age'
+    },
+  ],
+  on_finish: function(data){
+	  jsPsych.data.addProperties({age: data.response.Age});
+  },
+}
+
+
+
+var demogr_gender = {
+  type: jsPsychSurveyMultiChoice,
+  name: 'gender_query',
+  questions: [
+    {
+      prompt: "Please indicate with which gender you identify.", 
+      options: ['1: male', '2: female', '3: non-binary', '4: prefer not to say'],
+      required: true,
+      name: 'Gender'
+    },
+  ],
+  on_finish: function(data){
+	  jsPsych.data.addProperties({gender: data.response.Gender});
+  },
+};
+timeline.push(demogr_age, demogr_gender);
+
+
+
+
+/////////////////////////////////////// technical issues
+var tech_issues = {
+  type: jsPsychSurveyText,
+  name: 'Tech_issue_query',
+  questions: [
+    {prompt: 'In the text field below you can report any errors that you came across during the study (e.g., technical issues, layout problems, spelling errors, errors in program logic and flow, etc.).', 
+    rows: 10, 
+    columns: 100, 
+    required: false,
+    name: 'Tech_issue_report'
+    },
+  ],
+  on_finish: function(data){
+	  jsPsych.data.addProperties({tech_issues: data.response.Tech_issue_report});
+	  console.log(data.response.Tech_issue_report)
+  },
+}
+timeline.push(tech_issues);
+
+///////////////////////////////////// debriefing
+
+var debriefing = {
+  type: jsPsychHtmlButtonResponse,
+  stimulus: 
+    `
+    <img src="img/uni_org_color_li.png" width = 100%></img>
+    <p><b>Thank you for taking part in this study!</b></p>
+  
+    <p>The aim of this experiment is to find out more about how people form explanations. 
+    If you are interested in further details or if you have any questions or comments concerning the experiment, 
+    feel free to contact me (ANONYMIZED RESEARCHER) under <i>ANONYMIZED E-MAIL</i>
+    
+    <p>To ensure you receive your reward, please click the button below to return to the Prolific website:</p>
+    `
+    ,
+    choices: ['Finish study']
+};
+timeline.push(debriefing);
+
+
+
+/////////////////////////////////////////////////////////////////
+/* start the experiment */
+    jsPsych.run(timeline);
+
+  
+  </script>
+</html>

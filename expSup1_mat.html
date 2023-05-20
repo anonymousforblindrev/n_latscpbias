@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Supplementary Experiment 1</title>
+
+<script src="site_libs/header-attrs-2.18/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/readable.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+<link rel="icon" type="image/png" href="favicon.ico"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/iframe-resizer/3.5.16/iframeResizer.min.js" type="text/javascript"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+<link rel="stylesheet" href="styles.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-inverse  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html"></a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-home"></span>
+     
+    Home
+  </a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="glyphicon glyphicon-list-alt"></span>
+     
+    Main Experiments
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li class="dropdown-header">Materials, data, analysis, stimuli, print versions, and demos</li>
+    <li>
+      <a href="exp1a_mat.html">Experiment 1a</a>
+    </li>
+    <li>
+      <a href="exp1b_mat.html">Experiment 1b</a>
+    </li>
+    <li>
+      <a href="exp2_mat.html">Experiment 2</a>
+    </li>
+    <li>
+      <a href="exp3_mat.html">Experiment 3</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="glyphicon glyphicon-inbox"></span>
+     
+    Supplementary Studies
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li class="dropdown-header">Summary of Supplementary Studies</li>
+    <li>
+      <a href="expSup1_mat.html">Supplementary Study 1</a>
+    </li>
+    <li>
+      <a href="expSup2_mat.html">Supplementary Study 2</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Supplementary Experiment 1</h1>
+
+</div>
+
+
+<style>
+body {
+    font-family: 'Muli';
+    font-size: 14px;
+}
+</style>
+<!--
+<h2><font style="color:lightgrey;"> Stimuli </font></h1>
+-->
+<p><br></p>
+<hr />
+<div id="demo-version-of-experiment" class="section level1" number="1">
+<h1><span class="header-section-number">1</span> Demo Version of
+Experiment</h1>
+<p>To see a demo of the experiment in a separate browser window, click
+<a href="Supplementary_Studies/ExpSup1/experiment_files/task_local_demo/Exp_demo.html" target="_blank">here</a>.</p>
+<p>To download the program files of the experiment, click <a
+href="Supplementary_Studies/ExpSup2/experiment_files.zip">here</a>.</p>
+<hr />
+</div>
+<div id="data" class="section level1" number="2">
+<h1><span class="header-section-number">2</span> Data</h1>
+<ul>
+<li><a
+href="Supplementary_Studies/ExpSup1/data_and_analyses/exp_data.zip">Download
+Experimental data</a> [.csv-file; delimiter = “,”]</li>
+</ul>
+<div id="data-set-information" class="section level2" number="2.1">
+<h2><span class="header-section-number">2.1</span> Data set
+information</h2>
+<p>The data set contains the following columns:</p>
+<ul>
+<li><strong>subj_code</strong>: a random subject code</li>
+<li><strong>condition</strong>: a condition variable listing the 12
+conditions</li>
+<li><strong>desktop_conf</strong>: subjects’ confirmation of taking part
+via PC or Laptop</li>
+<li><strong>attent_conf</strong>: subjects’ confirmation to pay
+attention</li>
+<li><strong>scale_orient</strong>: counterbalancing factor coding the
+orientation of the rating scale</li>
+<li><strong>DV_rating</strong>: subjects’ selection in the test phase
+(main dV); 0 means narrow scope explanation if scale orientation is
+“narrow left”</li>
+<li><strong>Story</strong>: condition variable coding the sceneario
+subjects saw</li>
+<li><strong>LatentF</strong>: conditionv ariable coding the relaitve
+feature diagnosability of the the target features</li>
+<li><strong>explanation2</strong>: the 2nd dv asked in this study:
+subjects’ explanations of what they would have done hadn’t they been
+forced to choose between only two options.</li>
+<li><strong>narrow_check</strong>: memory check question asking for the
+defining features of the narrow scope category (hunter)</li>
+<li><strong>broad_check</strong>: memory check question asking for the
+defining features of the broad scope category (spear fisherman)</li>
+<li><strong>age</strong>: subjects’ age in year</li>
+<li><strong>gender</strong>: subjects’ gender</li>
+<li><strong>tech_issues</strong>: subjects’ report of potential
+technical problems</li>
+<li><strong>narrow_correct</strong>: column coding whether narrow_check
+was answered correctly</li>
+<li><strong>broad_ocrrect</strong>: column coding whether broad_check
+was answered correctly</li>
+</ul>
+<hr />
+</div>
+</div>
+<div id="analysis-script" class="section level1" number="3">
+<h1><span class="header-section-number">3</span> Analysis Script</h1>
+<ul>
+<li><a
+href="Supplementary_Studies/ExpSup1/data_and_analyses/Exp_Analysis.Rmd">View
+R-Markdown code</a></li>
+<li><a
+href="Supplementary_Studies/ExpSup1/data_and_analyses/Exp_Analysis.zip">Download
+R-Markdown code</a></li>
+<li><a
+href="Supplementary_Studies/ExpSup1/data_and_analyses/Exp_Analysis.html">View
+knitted/ compiled R-Markdown</a> (web view of analysis)</li>
+</ul>
+<hr />
+</div>
+<div id="description-of-the-study" class="section level1" number="4">
+<h1><span class="header-section-number">4</span> Description of the
+study</h1>
+<p>This study (<span class="math inline">\(N~= 252\)</span>) replicated
+the findings of Experiment~1b with three additional (fictitious) test
+scenarios. Two versions of each scenario were tested. In one, both
+category features had about equal diagnosability. In the other, the
+status of the latent feature was harder to determine than that of the
+evident feature. The goal was to demonstrate that the findings of
+Experiment~1b that document an influence of relative feature
+diagnosability generalize to other scenarios. One scenario was about a
+newly discovered species of desert plant (the Desert Daisy). Two
+sub-types were described (Type A and Type B), that were described to
+occur equally frequent. Both sub-types shared the feature “pearly white
+blossom”. The second feature varied between conditions. In the condition
+in which both features had similar diagnosability, the unique feature
+(the latent feature in the test case) was “thick green leaves”. In the
+condition in which the latent feature was harder to observe, it was
+“venomous liquid in its stem”. The structure of all three different
+scenarios was identical. The second scenario was about a rare stamp (the
+“Queen of the Caribbean”). The feature pairs in the condition with
+similar diagnosability were “ultramarine” (evident feature in the test
+case) and “yellow margin” (latent feature in the test case). In the
+other condition the latent feature was “yellow sticky back”. The third
+scenario was about Swiss watch (the “Weissentanner”). The shared feature
+in both diagnosability conditions was “little Swiss flag on the dial”.
+The latent features were “red digits” (similar visibility condition)
+vs. “red battery cover on its back” (condition where latent feature is
+harder to see). In the test phase, for all scenarios an exemplar was
+described in which the information about the latent feature read “you
+don’t know whether it also has [the unique feature] or not”. Subjects
+then rated to which category the exemplar most likely belongs to.</p>
+<div id="method" class="section level2" number="4.1">
+<h2><span class="header-section-number">4.1</span> Method</h2>
+<div id="participants" class="section level3" number="4.1.1">
+<h3><span class="header-section-number">4.1.1</span> Participants</h3>
+<p>Two hundred and fifty-two subjects (<span
+class="math inline">\(M_{age}\,= 39\)</span>, <span
+class="math inline">\(SD_{age}\,= 13.65\)</span>, age range 18 to 74
+years) recruited via the online platform participated in this online
+study and provided valid data. The inclusion criteria were a minimum age
+of 18 years, English as first language, and an approval rate (concerning
+subjects’ participation in online studies hosted via prolific) of 90
+percent. To ensure that all participants are able to understand the
+written instructions, prolific workers with “no formal qualifications”
+for the criterion “highest education level completed” were excluded from
+participation. Subjects also were asked to take part via PC or Laptop,
+and not via Tablet or Smartphone.</p>
+<p>The study was planned for precision. The stopping rule for data
+collection was that no 95% CI of the group means for the three scenarios
+should be wider than 1.0. There should also be equally many subjects in
+each conditions. This criterion was reached after 42 subjects per
+condition.</p>
+</div>
+<div id="design-materials-and-procedure" class="section level3"
+number="4.1.2">
+<h3><span class="header-section-number">4.1.2</span> Design, materials,
+and procedure</h3>
+<p>The study had two main factors, which were manipulated between
+subjects. One was relative feature diagnosability, which had two levels
+(both features similar vs. latent feature harder to diagnose). The other
+factor was the scenario, which had three levels (Flower vs. Stamp
+vs. Watch). An additional counterbalancing factor was the orientation of
+the rating scale shown in the test phase (narrow scope explanation on
+left side vs. right side). This led to a total of 12 between-subjects
+conditions. The procedure was largely identical to the procedure of
+Experiment~1b. Readers may use the link to the demo of the study.</p>
+<p>The different scenario descriptions in the different “relative
+feature diagnosability” conditions were (with the features in the
+condition in which the latent feature was harder to diagnose in []):</p>
+<p><u>Desert Daisy</u>:</p>
+<blockquote>
+<p>In the desert region of Al Amanur between China and Mongolia,
+botanists recently discovered a new kind of plant, the Desert Daisy.
+There are two subtypes of the Desert Daisy, Type A and Type B. Both
+occur equally often. Desert Daisy Type A has a pearly white blossom.
+Desert Daisy Type B also has a pearly white blossom, but unlike Desert
+Daisy Type A, it also has thick green leaves [it also has a venomous
+liquid in its stem].</p>
+You’re on a trip through Al Amanur desert and come across a Desert Daisy
+that has a pearly white blossom, but you don’t know whether it also has
+thick green leaves [the venomous liquid in its stem] or not.
+</blockquote>
+<p><u>Queen of the Caribbean</u>:</p>
+<blockquote>
+<p>In the world of stamp collectors, the holy grail for any collector is
+a stamp called “Queen of the Caribbean”. There are two subtypes of this
+stamp, Type A and Type B. Both occur equally often. Queen of the
+Caribbean Type A is ultramarine. Queen of the Caribbean Type B also is
+ultramarine, but unlike Queen of the Caribbean Type A, it also has a
+yellow margin [sticky backside that is yellow].</p>
+You’re on a flea market and come across an old postcard with a Queen of
+the Caribbean on it. The stamp is ultramarine, but you don’t know
+whether it also has a yellow margin [a yellow sticky back].
+</blockquote>
+<p><u>Weissentanner</u>:</p>
+<blockquote>
+<p>In the valley of Weissentann in Switzerland a watch manufacturer
+produces a kind of watch that is the dream of any watch lover. It’s
+called the “Weissentanner”. There are two subtypes of the Weissentanner,
+Type A and Type B. Both are produced in equal numbers and are equally
+expensive, which is why both types are found equally often.
+Weissentanner Type A has a little Swiss flag on its dial. Weissentanner
+Type B also has a little Swiss flag on its dial, but unlike
+Weissentanner Type A, it also has red digits [a red battery cover on its
+back].</p>
+You’re on a train through the valley of Weissentann and you realize that
+the person sitting next to you is wearing a Weissentanner. The watch has
+the little Swiss flag on its dial but you don’t know whether it also has
+red digits [a red battery cover on its back].
+</blockquote>
+<p>In each scenario, subjects answered the following test question:</p>
+<blockquote>
+<p>To which category of [Desert Daisy; Queen of the Caribbean;
+Weissentanner] do you think this [flower; stamp; watch] belongs to?</p>
+</blockquote>
+<p>Subjects provided their ratings on an eleven-point rating scale with
+the endpoint labeled “Definitely Type A”, the midpoint labeled “50:50
+(both equally likely)” and the other endpoint labeled “Definitely Type
+B”. The orientation of the scale was counterbalanced between
+subjects.</p>
+<p>Subjects also provided brief open-ended explanations of their
+ratings. They then were asked two memory check questions and only the
+data of subjects who responded correctly to both question were recorded
+for analyses. The memory check probed the defining features of the two
+types of entities presented in the scenario (run Demo of the experiment
+to see the memory checks. To run the demo, click <a
+href="Supplementary_Studies/ExpSup1/experiment_files/task_local_demo/Exp_demo.html">here</a>).</p>
+<p>Subjects provide demographic information, were given the chance to
+report technical complications they may have experienced, and then ended
+the study on a short debriefing screen.</p>
+</div>
+</div>
+<div id="results-and-discussion" class="section level2" number="4.2">
+<h2><span class="header-section-number">4.2</span> Results and
+discussion</h2>
+<p>A figure that shows subjects ratings in the three different scenarios
+is shown below (squares are means, “+” are medians, error bars are 95%
+CIs of the means, jittered dots show subjects’ ratings and violin plots
+their distributions):</p>
+<p><img
+src="Supplementary_Studies/ExpSup1/data_and_analyses/results_scen_means_mainDV.svg" /></p>
+<p>Subjects tended to prefer the narrow latent scope explanation if both
+features had similar diagnosability (although there was no difference in
+the watch scenario). Averaging over the scenarios, the following graph
+shows the difference between these two theoretically relevant conditions
+(squares are means, “+” are medians, error bars are 95% CIs of the
+means, jittered dots show subjects’ ratings and violin plots their
+distributions):</p>
+<p><img
+src="Supplementary_Studies/ExpSup1/data_and_analyses/results_means_mainDV.svg" />
+<br></p>
+<p>All statistical parameters and tests can be found in the knitted
+R-Markdown Analysis file, which can be accessed <a
+href="Supplementary_Studies/ExpSup1/data_and_analyses/Exp_Analysis.html">here</a>.
+The analysis revealed that the means in these two conditions were
+different from each other, which corroborates the hypothesis that
+relative feature diagnosability influences subjects’ preferences.</p>
+<p>The graphs also show that narrow latent scope biases were exhibited
+only by a subgroup of subjects. A graph showing the different categories
+of subject responses (and their proportions) is shown below:</p>
+<p><img
+src="Supplementary_Studies/ExpSup1/data_and_analyses/categories.svg" />
+<br></p>
+<p>All in all the results of this additional study complement the
+findings of Experiment~1b and lead to the conclusion that past studies
+who tested features with similar relative feature diagnosability tended
+to overestimate genuine narrow latent scope biases. The reason is that
+under conditions of similar relative feature diagnosability, subjects’
+preference for the narrow latent scope explanation may be pragmatically
+warranted: observing one feature but not knowing the status of another
+that should be as easy to see is more likely to happen in a world in
+which that latent feature is actually absent.</p>
+</div>
+</div>
+
+<p><font size="-1.5">2023 ANONYMIZED AUTHOR.</font></p>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,163 @@
+---
+title: "Analysis"
+output:  
+  html_document:
+    number_sections: true
+    toc: true  
+    collapsed: false
+    toc_float: true
+    smooth_scroll: false
+    toc_depth: 3
+---
+
+```{r setup, include=FALSE}
+# packages
+library(ez)
+library(reshape2)
+library(reshape)
+library(ggplot2)
+library(plyr)
+library(pastecs)
+library(ez)
+library(data.table)
+library(tidyverse) 
+
+library(showtext)
+library(readr)
+
+
+font_add_google("Poppins", "Poppins")
+font_add_google("Roboto Mono", "Roboto Mono")
+showtext_auto()
+```
+
+
+```{r}
+tdata <- read_csv("pilot_data.csv")
+#tdata <- read.table("dummy_dat.csv", sep=';', header = T)
+
+#tdata <- subset(tdata, subj_code != "RhoYo25w8umI") # This person needs to be excluded because they definitely did not understand the task
+
+```
+
+
+# Subject demographics
+
+```{r}
+# demographics 
+
+min(tdata$age)
+max(tdata$age)
+mean(tdata$age)
+sd(tdata$age)
+
+# 1 = male, 2 = female, 3 = other
+table(tdata$gender)
+```
+
+1 = male, 2 = female, 3 = non-binary, 4 = prefer not to say
+
+
+
+
+
+
+# Results
+
+```{r, echo = FALSE}
+# reorder factor 
+
+# to create chart, the data must be in long format and only contain the relevant dependent variables
+
+# 1. make a subset with only the relevant dvs
+
+tdata_long <- tdata
+
+
+tdata_long$scale_orient <- factor(tdata_long$scale_orient, levels = c("narrow_left", "narrow_right"), 
+                               labels = c("narrow_left", "narrow_right"))
+
+
+
+# Recode ratings so that high values represent broad scope and low values represent narrow scope
+
+dat_narrow_left <- subset(tdata_long, scale_orient == "narrow_left")
+dat_narrow_left$rating_rec <- (dat_narrow_left$DV_rating) - 5
+
+dat_narrow_right <- subset(tdata_long, scale_orient == "narrow_right")
+dat_narrow_right$rating_rec <- (dat_narrow_right$DV_rating * -1) + 5
+
+tdata_long <- rbind(dat_narrow_left, dat_narrow_right)
+
+
+```
+
+## Graphs
+
+```{r}
+myTheme <- theme(plot.title = element_text(face="bold", size = 22),
+        axis.title.x = element_text(size = 20),
+        axis.title.y = element_text(size = 20),
+        axis.text.x = element_text(size = 14, angle = 0), 
+        axis.text.y = element_text(size = 16, angle = 0),
+        legend.text = element_text(size = 18),
+        legend.title = element_text(face = "bold", size = 18),
+        strip.text.x = element_text(size = 18),
+        #panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(), 
+        panel.background = element_blank(), 
+        axis.line.x = element_line(colour = "black"), 
+        axis.line.y = element_line(colour = "black"),
+        axis.text = element_text(colour ="black"), 
+        axis.ticks = element_line(colour ="black"))
+
+tdata_sub <- tdata_long
+
+
+library(see)
+## first, turn sID into a factor
+tdata_sub$subj_code <- factor(tdata_sub$subj_code)
+
+pd <- position_dodge(width = 0.3)
+
+tdata_sub$valueJitter <- jitter(tdata_sub$rating_rec, factor = 0.01, amount = 0.004)
+
+theme_set(theme_light(base_size = 20, base_family = "Poppins"))
+
+# new labes for the facets 
+
+g <- ggplot(tdata_sub, aes(x = outcome_valence, y = valueJitter)) +
+  guides(fill=FALSE)+
+  facet_grid( ~ dv_query)+
+  #ggtitle("Subjects' causal srength ratings") +
+  scale_y_continuous(limits = c(-5.3, 5.3), breaks=seq(-5, 5, 1), expand = c(0,0)) +
+  #scale_x_discrete(labels=c("no \ninformation", "'You don't \nknow'")) +
+  #stat_summary(fun.y = mean, geom = "bar", position = "dodge", colour = "black", alpha =0.5) +
+  geom_violinhalf(aes(y = rating_rec, group = outcome_valence, fill = outcome_valence), color = NA, 
+                  position=position_dodge(1), alpha = 0.4)+
+  #geom_line(position = pd, color = "black", size = 1, alpha=0.04) +
+  geom_hline(yintercept=0, linetype="dashed", color = "black")+
+  geom_jitter(aes(color = outcome_valence), alpha = 0.5, width = 0.15, height = 0.2) +
+  stat_summary(aes(y = rating_rec, group=1), fun.data = mean_cl_boot, 
+               geom = "errorbar", width = 0, size = 1) +
+  stat_summary(aes(y = rating_rec, group=1, fill = outcome_valence), fun.y=mean, geom="point", 
+               color = "black", shape = 22, size = 2, group=1, alpha = 1)+
+  stat_summary(aes(y = rating_rec,group=1), fun.y=median, geom="point", color = "black", shape = 3, size = 4, 
+               group=1, alpha = 1, position = position_dodge(width = 0.5))+
+  labs(x = "Outcome outcome_valence", y = "Explanation rating") +
+  scale_color_manual(name = "Strength",values=c("#66c2a5", "#e78ac3", "#8da0cb", "#a6d854"))+
+  scale_fill_manual(name = "Strength",values=c("#66c2a5", "#e78ac3", "#8da0cb", "#a6d854"))+
+  annotate("text", x = 0.5, y = 3.5, label = c("broad-scope"), angle = 90)+
+  annotate("text", x = 0.5, y = -3.5, label = c("narrow-scope"), angle = 90)+
+  theme(legend.position = "none")+
+  myTheme
+g
+
+
+#ggsave("results_means_mainDV.svg",width=7,height=5)
+#ggsave("results_means_selection.pdf",width=11,height=5)
+```
+
+
+
+
