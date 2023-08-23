@@ -1,0 +1,196 @@
+---
+title: "Explanation Analysis"
+output:  
+  html_document:
+    number_sections: true
+    toc: true  
+    collapsed: false
+    toc_float: true
+    smooth_scroll: false
+    toc_depth: 3
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+# packages
+library(ez)
+library(reshape2)
+library(reshape)
+library(ggplot2)
+library(plyr)
+library(pastecs)
+library(ez)
+library(data.table)
+library(tidyverse) 
+
+library(showtext)
+library(readr)
+library(scales)
+
+font_add_google("Poppins", "Poppins")
+font_add_google("Roboto Mono", "Roboto Mono")
+showtext_auto()
+```
+
+
+```{r}
+explan_data <- read_delim("subject_explanations.csv", 
+    delim = ";", escape_double = FALSE, trim_ws = TRUE)
+```
+
+```{r}
+# remove subject with duplicate entry
+explan_data <- explan_data %>% distinct(subj_code, .keep_all = TRUE)
+
+# Note that two rows appear twice, and the duplicates must be deleted
+```
+
+
+
+# Data preparation
+
+```{r, echo = FALSE}
+# reorder factor 
+
+# to create chart, the data must be in long format and only contain the relevant dependent variables
+
+# 1. make a subset with only the relevant dvs
+
+tdata_long <- explan_data
+
+
+tdata_long$scale_orient <- factor(tdata_long$scale_orient, levels = c("narrow_left", "narrow_right"), 
+                               labels = c("narrow_left", "narrow_right"))
+
+
+
+
+tdata_long$`Correct explanation`[is.na(tdata_long$`Correct explanation`)] <- "0"
+tdata_long$`Unclear explanation`[is.na(tdata_long$`Unclear explanation`)] <- "0"
+tdata_long$`Inferred absence because of low feature base rate`[is.na(tdata_long$`Inferred absence because of low feature base rate`)] <- "0"
+tdata_long$`Inferred absence of latent feature due to visibility`[is.na(tdata_long$`Inferred absence of latent feature due to visibility`)] <- "0"
+
+
+```
+
+
+Note: Subjects' explanations were coded in the last columns (the column names describe the coded criterion). 1 means that the coding criterion is (clearly) met, 0 that it isn't. 
+
+```{r}
+# turn explanation coding values into factors 
+
+explan_data <- tdata_long
+
+explan_data$`Correct explanation` <- as.factor(explan_data$`Correct explanation`)
+
+explan_data$`Unclear explanation` <- as.factor(explan_data$`Unclear explanation`)
+
+explan_data$`Inferred absence because of low feature base rate` <- as.factor(explan_data$`Inferred absence because of low feature base rate`)
+
+explan_data$`Inferred absence of latent feature due to visibility` <- as.factor(explan_data$`Inferred absence of latent feature due to visibility`)
+
+```
+
+
+# Explanation Analysis
+
+1. Proportions of subjects who gave (correct) explanations for why the answer is 50:50
+
+```{r}
+# create a summary dataset that also contains the percentages
+plotdata_between <- explan_data %>%
+  group_by(`Correct explanation`) %>%
+  summarize(n = n()) %>% 
+  mutate(pct = n/sum(n),
+         lbl = scales::percent(pct))
+
+
+plotdata_between
+
+plotdata_sub <- subset(plotdata_between, `Correct explanation` == 1)
+```
+
+
+
+```{r}
+plotdata <- plotdata_between
+
+g<- ggplot(plotdata, 
+       aes(x = "",
+           y = pct,
+           fill = `Correct explanation`)) +
+  #facet_grid( ~ Features)+
+  geom_bar(stat = "identity",
+           position = "fill") +
+  scale_y_continuous(limits = seq(0, 2),
+                     breaks = seq(0, 1, .25),
+                     expand = c(0,0),
+                     label = percent) +
+  #scale_x_discrete(labels = c("not \nmentioned", "'you don't \nknow'"))+
+  coord_cartesian(xlim =c(1, 2), ylim = c(0, 1.1))+
+  #coord_cartesian(clip = "off")+
+  geom_text(aes(label = lbl), 
+            size = 4.5,
+            position = position_stack(vjust = 0.5)) +
+  scale_fill_brewer(palette = "Pastel1") +
+  labs(y = "Percentage", 
+       fill = "Correct Explanation",
+       x = "Features")+
+  theme(legend.position = "top", axis.title = element_text(size = 15), axis.text = element_text(size = 13, color = "black"),
+        legend.text = element_text(size = 13),legend.title = element_text(size = 13))+
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+
+g
+```
+
+
+
+2. proportions of subjects who inferred the absence of the unobserved feature due to its low overall probability (inferred evidence account)
+
+```{r}
+# create a summary dataset that also contains the percentages
+plotdata_between <- explan_data %>%
+  group_by(`Inferred absence because of low feature base rate`) %>%
+  summarize(n = n()) %>% 
+  mutate(pct = n/sum(n),
+         lbl = scales::percent(pct))
+
+
+plotdata_between
+
+plotdata_sub <- subset(plotdata_between, `Inferred absence because of low feature base rate` == 1)
+```
+
+
+```{r}
+plotdata <- plotdata_between
+
+g<- ggplot(plotdata, 
+       aes(x = "",
+           y = pct,
+           fill = `Inferred absence because of low feature base rate`)) +
+  #facet_grid( ~ Features)+
+  geom_bar(stat = "identity",
+           position = "fill") +
+  scale_y_continuous(limits = seq(0, 2),
+                     breaks = seq(0, 1, .25),
+                     expand = c(0,0),
+                     label = percent) +
+  #scale_x_discrete(labels = c("not \nmentioned", "'you don't \nknow'"))+
+  coord_cartesian(xlim =c(1, 2), ylim = c(0, 1.1))+
+  #coord_cartesian(clip = "off")+
+  geom_text(aes(label = lbl), 
+            size = 4.5,
+            position = position_stack(vjust = 0.5)) +
+  scale_fill_brewer(palette = "Pastel1") +
+  labs(y = "Percentage", 
+       fill = "Correct Explanation",
+       x = "Features")+
+  theme(legend.position = "top", axis.title = element_text(size = 15), axis.text = element_text(size = 13, color = "black"),
+        legend.text = element_text(size = 13),legend.title = element_text(size = 13))+
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+
+g
+```
+
+

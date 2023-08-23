@@ -35,7 +35,6 @@ showtext_auto()
 
 ```{r}
 tdata <- read_csv("exp_data.csv")
-
 ```
 
 
@@ -104,7 +103,312 @@ tdata_long$Knowledge <- factor(tdata_long$Knowledge, levels = c("notKnow", "noIn
 
 ```
 
+
+```{r}
+tdata_main <- subset(tdata_long, Knowledge == "'you don't know'")
+tdata_supp <- subset(tdata_long, Knowledge == "no information")
+```
+
+
+
 ## Graphs
+
+```{r}
+myTheme <- theme(plot.title = element_text(face="bold", size = 22),
+        axis.title.x = element_text(size = 20),
+        axis.title.y = element_text(size = 20),
+        axis.text.x = element_text(size = 14, angle = 0), 
+        axis.text.y = element_text(size = 16, angle = 0),
+        legend.text = element_text(size = 18),
+        legend.title = element_text(face = "bold", size = 18),
+        strip.text.x = element_text(size = 18),
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(), 
+        panel.background = element_blank(), 
+        axis.line.x = element_line(colour = "black"), 
+        axis.line.y = element_line(colour = "black"),
+        axis.text = element_text(colour ="black"), 
+        axis.ticks = element_line(colour ="black"))
+
+tdata_sub <- tdata_main
+
+
+library(see)
+## first, turn sID into a factor
+tdata_sub$subj_code <- factor(tdata_sub$subj_code)
+
+pd <- position_dodge(width = 0.3)
+
+tdata_sub$valueJitter <- jitter(tdata_sub$rating_rec, factor = 0.01, amount = 0.004)
+
+theme_set(theme_light(base_size = 20, base_family = "Poppins"))
+
+# new labes for the facets 
+
+g <- ggplot(tdata_sub, aes(x = Features, y = valueJitter)) +
+  guides(fill=FALSE)+
+  #facet_grid( ~ Knowledge)+
+  #ggtitle("Subjects' causal srength ratings") +
+  scale_y_continuous(limits = c(-5.3, 5.3), breaks=seq(-5, 5, 1), expand = c(0,0)) +
+  scale_x_discrete(labels=c("Spear and \nnet", "Feathers and \ntooth")) +
+  #stat_summary(fun.y = mean, geom = "bar", position = "dodge", colour = "black", alpha =0.5) +
+  geom_violinhalf(aes(y = rating_rec, group = Features, fill = Features), color = NA, 
+                  position=position_dodge(1), alpha = 0.4)+
+  #geom_line(position = pd, color = "black", size = 1, alpha=0.04) +
+  geom_hline(yintercept=0, linetype="dashed", color = "black")+
+  geom_jitter(aes(color = Features), alpha = 0.5, width = 0.15, height = 0.2) +
+  stat_summary(aes(y = rating_rec, group=1), fun.data = mean_cl_boot, 
+               geom = "errorbar", width = 0, size = 1) +
+  stat_summary(aes(y = rating_rec, group=1, color = outcome_valence), fun.y=mean, geom="line", 
+               color = "black", shape = 22, size = 1, alpha = .7)+
+  stat_summary(aes(y = rating_rec, group=1, fill = Features), fun.y=mean, geom="point", 
+               color = "black", shape = 22, size = 2, group=1, alpha = 1)+
+  stat_summary(aes(y = rating_rec,group=1), fun.y=median, geom="point", color = "black", shape = 3, size = 4, 
+               group=1, alpha = 1, position = position_dodge(width = 0.5))+
+  labs(x = "Category Features", y = "Categorization Rating") +
+  scale_color_manual(name = "Strength",values=c("#66c2a5", "#e78ac3", "#8da0cb", "#a6d854"))+
+  scale_fill_manual(name = "Strength",values=c("#66c2a5", "#e78ac3", "#8da0cb", "#a6d854"))+
+  annotate("text", x = 0.5, y = 3.5, label = c("broad-scope"), angle = 90)+
+  annotate("text", x = 0.5, y = -3.5, label = c("narrow-scope"), angle = 90)+
+  theme(legend.position = "none")+
+  myTheme+
+  theme(panel.grid.major = element_line(color = "lightgrey",
+                                        size = 0.5,
+                                        linetype = 'dotted'))+
+  stat_summary(aes(label=round(after_stat(y),2)), fun.y=mean, geom="text", size=5,
+             vjust = -6)
+
+g
+
+ggsave("results_means_mainDV.svg",width=4,height=5)
+ggsave("results_means_mainDV.pdf",width=4,height=5)
+#ggsave("results_means_selection.pdf",width=11,height=5)
+```
+
+```{r}
+library(ggridges)
+g2 <- ggplot(tdata_sub, aes(x = rating_rec, y = Features, fill = after_stat(x))) +
+  geom_density_ridges_gradient() +
+  #geom_density_ridges(fill = "lightblue", alpha = 0.5)+
+   #stat_summary(aes(x = rating_rec), fun.x=mean, geom="point", 
+  #             color = "black", shape = 22, size = 2, group=1, alpha = 1)+
+  scale_fill_viridis_c(name = "Explanation \nRating", option = "C")+
+  labs(x = "Rating", y = "Category Features") +
+  myTheme
+
+g2
+```
+
+
+
+Use the ggplot_build package to see a table with the means and CI values plotted in the graph: 
+
+```{r}
+values <- ggplot_build(g)$data[[4]] # values are shown in the 4th panel 
+values
+```
+
+get group medians: 
+
+```{r}
+library(rcompanion)
+# groupwiseMean(rating_rec ~ Features + Knowledge,
+#               data        = tdata_long,
+#               traditional = FALSE,
+#               percentile  = TRUE)
+
+groupwiseMedian(rating_rec ~ Features,
+                data        = tdata_main,
+                bca         = FALSE,
+                percentile  = TRUE,
+                R           = 1000)
+```
+
+
+
+```{r}
+counts <- tdata_main %>%
+  group_by(Features, rating_rec) %>%
+  summarize(n = n()) %>% 
+  mutate(pct = n/sum(n),
+         lbl = scales::percent(pct))
+
+counts
+```
+
+
+```{r}
+
+tdata_main$category[tdata_main$rating_rec < 0] <- "narrow"
+tdata_main$category[tdata_main$rating_rec == 0] <- "unbiased"
+tdata_main$category[tdata_main$rating_rec > 0] <- "broad"
+
+counts2 <- tdata_main %>%
+  group_by(Features, category) %>%
+  summarize(n = n()) %>% 
+  mutate(pct = n/sum(n),
+         lbl = scales::percent(pct))
+
+
+counts2
+
+counts2$category <- factor(counts2$category, levels = c("unbiased", "narrow", "broad"), labels = c("unbiased", "narrow l.s.", "broad l.s."))
+
+```
+
+
+Get proportion CIs for different categories in each diagnosability condition:
+
+```{r}
+library(PropCIs)
+library(DescTools)
+library(purrr)
+
+counts_spear <- subset(counts2, Features == "Spear and net")
+
+counts_feather <- subset(counts2, Features == "Feathers and tooth")
+
+
+(MultinomCI(counts_spear$n,
+           conf.level=0.95,
+           method="sisonglaz") -> selection_ci_1)
+
+  
+(MultinomCI(counts_feather$n,
+           conf.level=0.95,
+           method="sisonglaz") -> selection_ci_2)
+  
+
+
+
+ci_low <- c(selection_ci_1[,2], selection_ci_2[,2])
+
+ci_up <- c(selection_ci_1[,3], selection_ci_2[,3])
+
+
+```
+
+
+```{r}
+plotdata <- counts2
+
+plotdata$ci_low <- ci_low
+plotdata$ci_up <- ci_up
+```
+
+
+Plot:
+
+```{r}
+
+library(scales)
+theme_set(theme_light(base_size = 12, base_family = "Poppins"))
+
+g<- ggplot(plotdata, 
+       aes(x = category,
+           y = pct,
+           fill = Features)) +
+  facet_grid( ~ Features)+
+  geom_bar(stat = "identity",
+           position = "dodge") +
+  scale_y_continuous(limits = seq(0, 2),
+                     breaks = seq(0, 1, .25),
+                     expand = c(0,0),
+                     label = percent) +
+  #coord_cartesian(xlim =c(1, 7), ylim = c(0, 1.1))+
+  #coord_cartesian(clip = "off")+
+  geom_text(aes(label = lbl), 
+            size = 3.5,
+            position = position_dodge(width = 1),
+            vjust = -6.5) +
+  scale_fill_manual(name = "Strength",values=c("#66c2a5", "#e78ac3", "#8da0cb", "#a6d854"))+
+  #scale_fill_brewer(palette = "Pastel1") +
+  labs(y = "Percentage", 
+       fill = "Explanatory preference",
+       x = "Explanatory preference")+
+  geom_pointrange(ymin = ci_low, ymax = ci_up, position = position_dodge(width = 0.89), shape = 22, size = 0.3)+
+  #annotate(geom = "hline",yintercept = 0.5, y = 0.5, color = "black", size = 1, linetype='dotted')+
+  #annotate("pointrange", x = plotdata$Transformation, y = plotdata$pct, 
+   #        ymin = plotdata$ci_low, 
+    #       ymax = plotdata$ci_up, 
+     #      colour = "black", size = 0.8, shape = 22, fill = Transformation, fatten = 1)+
+  #annotate("text", x = pvalues_x, y = Inf, label = pvalues, size = 4, vjust = 1.8)+
+  theme(legend.position = "none", axis.title = element_text(size = 20), axis.text = element_text(size = 13, color = "black"),
+        legend.text = element_text(size = 13),legend.title = element_text(size = 13),strip.text.x = element_text(size = 13))+
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+
+g
+
+#ggsave("selections_between.pdf",width=6,height=5)
+ggsave("categories_main.svg",width=7,height=5)
+ggsave("categories_main.pdf",width=7,height=5)
+```
+
+
+## Analyses
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+################################################################################################################
+##################################### Statistical Analyses #####################################################
+################################################################################################################
+library(pastecs)
+library(lme4)
+library(nlme)
+library(ez)
+library(vtable)
+library(rcompanion)
+```
+
+
+### Model comparisons
+
+
+```{r}
+library(afex)
+library(emmeans)
+
+a1 <- aov_car(rating_rec ~ Features + Error(subj_code), tdata_main, anova_table = list(es = "pes"))
+a1
+
+```
+### t-test
+
+
+```{r}
+t.test(rating_rec ~ Features, data = tdata_main, var.equal = F, alternative = "two.sided", paired = F) # two sided is used here to get the full confidence interval of the difference; note, however, that the hypothesis was a directed one (thus, alternative = "less" could have been used to get the one-sided p-value). 
+```
+
+
+### Proportion tests for behavior categories 
+
+Test if proportion of unbiased subjects is higher in feathe_tooth vs. spear_net
+
+```{r}
+unbiased_props <- prop.test(x = c(counts2$n[3], counts2$n[4]), n = c(50, 50), alternative = "less", correct = F)
+unbiased_props
+```
+
+
+
+
+## Analyses with additional condition 
+
+this part of the analysis script reports an analysis that includes the additional between-subjects conditions in which the latent feature was not mentioned in the test case description.
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+################################################################################################################
+##################################### Statistical Analyses #####################################################
+################################################################################################################
+library(pastecs)
+library(lme4)
+library(nlme)
+library(ez)
+library(vtable)
+library(rcompanion)
+```
+
+
+### Graphs
 
 ```{r}
 myTheme <- theme(plot.title = element_text(face="bold", size = 22),
@@ -171,8 +475,8 @@ g <- ggplot(tdata_sub, aes(x = Features, y = valueJitter)) +
 
 g
 
-ggsave("results_means_mainDV.svg",width=7,height=5)
-ggsave("results_means_mainDV.pdf",width=7,height=5)
+#ggsave("results_means_mainDV.svg",width=7,height=5)
+#ggsave("results_means_mainDV.pdf",width=7,height=5)
 #ggsave("results_means_selection.pdf",width=11,height=5)
 ```
 
@@ -259,21 +563,21 @@ counts_feather_noinf <- subset(counts2, Features == "Feathers and tooth" & Knowl
 
 (MultinomCI(counts_spear_notknow$n,
            conf.level=0.95,
-           method="sisonglaz") -> selection_ci_1)
+           method="wald") -> selection_ci_1)
   
 
 (MultinomCI(counts_spear_noinf$n,
            conf.level=0.95,
-           method="sisonglaz") -> selection_ci_2)
+           method="wald") -> selection_ci_2)
   
 (MultinomCI(counts_feather_notknow$n,
            conf.level=0.95,
-           method="sisonglaz") -> selection_ci_3)
+           method="wald") -> selection_ci_3)
   
 
 (MultinomCI(counts_feather_noinf$n,
            conf.level=0.95,
-           method="sisonglaz") -> selection_ci_4)
+           method="wald") -> selection_ci_4)
   
 
 
@@ -304,7 +608,7 @@ theme_set(theme_light(base_size = 12, base_family = "Poppins"))
 g<- ggplot(plotdata, 
        aes(x = category,
            y = pct,
-           fill = category)) +
+           fill = Features)) +
   facet_grid(Features ~ Knowledge)+
   geom_bar(stat = "identity",
            position = "dodge") +
@@ -337,25 +641,11 @@ g<- ggplot(plotdata,
 g
 
 #ggsave("selections_between.pdf",width=6,height=5)
-ggsave("categories.svg",width=7,height=5)
-ggsave("categories.pdf",width=7,height=5)
+#ggsave("categories.svg",width=7,height=5)
+#ggsave("categories.pdf",width=7,height=5)
 ```
 
 
-
-## Analyses
-
-```{r, echo = FALSE, warning = FALSE, message = FALSE}
-################################################################################################################
-##################################### Statistical Analyses #####################################################
-################################################################################################################
-library(pastecs)
-library(lme4)
-library(nlme)
-library(ez)
-library(vtable)
-library(rcompanion)
-```
 
 
 ### Model comparisons
@@ -370,30 +660,6 @@ a1
 
 ```
 more digits for the p.values can be obtained by running model comparisons manually.
-
-```{r}
-null <- lme(rating_rec ~ 1, random = ~1|subj_code, data = tdata_long, method = "ML")
-
-main_features <- lme(rating_rec ~ Features, random = ~1|subj_code, data = tdata_long, method = "ML")
-
-anova(null, main_features)
-```
-
-
-```{r}
-main_knowledge <- lme(rating_rec ~ Features + Knowledge, random = ~1|subj_code, data = tdata_long, method = "ML")
-
-anova(null, main_features, main_knowledge)
-```
-
-
-```{r}
-interaction <- lme(rating_rec ~ Features*Knowledge, random = ~1|subj_code, data = tdata_long, method = "ML")
-
-anova(null, main_features, main_knowledge, interaction)
-```
-
-
 
 ### Contrasts
 
@@ -415,7 +681,49 @@ s
 confint(s, level = 0.95)
 ```
 
+This additional condition provides additional evidence that subjects pragmatically rely on the presented information to try to infer the status of the latent feature. Here, subjects who read the ``spear-net''  scenario showed the most pronounced latent-scope bias ($M~= -1.38$, 95\% CI [$-1.96, -0.84$], Median~=$0$). This was predicted because it is reasonable to assume that a situation in which one feature (the net) that should be just as easily observable as another (the spear) isn't mentioned at all is more likely to happen in a world in which that feature is actually absent. A contrast analysis (comparison of green graphs in Fig.~\ref{fig:Exp_tokoloCont_res}) showed that the latent scope bias in this condition was larger than in the corresponding spear-net condition that used the ``you don't know'' phrasing ($\Delta M~= -0.88$, $t$(196)~$= 3.41$, $p~< .001$).  However, even here 32 subjects (64\%) still weren't biased. Furthermore, as predicted, in the ``no information condition'' in which subjects saw the ``feather-tooth'' scenario not mentioning the latent feature at all had less pragmatic influence. In this condition, 44 subjects (88\%) gave unbiased ratings, and only five (10\%) gave ratings indicating a latent-scope bias ($M~= -0.16$, 95\% CI [$-0.48, 0.16$], Median~=$0$). The observed pattern in this condition suggests that not mentioning the status of a feature that is anyway expected to be unobserved is regarded as less diagnostic for a situation in which that feature is actually absent. 
 
 
+# Compare behavior proportions with those observed in first study
+
+One should also compare the observed behavior proportions with those that were observed under the forced-choice response format test context that was used in the previous experiment. This will be done here. 
+
+First, create an object that contains the results of the previous (forced-choice) study.
+
+```{r}
+Study <- c(rep("Forced",4))
+Features <- c("Spear and net", "Spear and net", "Feathers and tooth", "Feathers and tooth")
+category <- c("narrow l.s.", "broad l.s.", "narrow l.s.", "broad l.s.") # note that "unbiased" is actually not a reasonable category here as subjects had to choose one explanation (this was included here only for the sake of comparability with the continuous scale experiment)
+
+n <- c(32,8,37,3)
+pct <- c(0.80,0.20,0.925,0.075)
+lbl <- c("80%", "20%", "92%", "8%") 
+props_expForced <- data.frame(Features, category, n, pct, lbl, Study)
+```
 
 
+Now take the proportions of the current study (but include only the relevant "You don't know" condition)
+
+```{r}
+props_contScale <- subset(counts2, Knowledge == "'you don't know'")
+props_contScale <- subset(props_contScale, select = c(1,3:6))
+props_contScale$Study <- c("Scale")
+```
+
+```{r}
+inter_exp_probs <- rbind(props_expForced, props_contScale)
+```
+
+
+1. Cross-exp. Comparison for the original "spear-net" condition. Test if proportion of narrow latent scope biases is reduced in the current experiment that uses a continuous scale test format.
+
+```{r}
+biased_props_spear_net <- prop.test(x = c(inter_exp_probs$n[6], inter_exp_probs$n[1]), n = c(50, 40), alternative = "less", correct = F)
+biased_props_spear_net
+```
+2. Cross-exp. Comparison for the novel "feather-tooth" condition. Test if proportion of narrow latent scope biases is reduced in the current experiment that uses a continuous scale test format.
+
+```{r}
+biased_props_feather_tooth <- prop.test(x = c(0, inter_exp_probs$n[3]), n = c(50, 40), alternative = "less", correct = F)
+biased_props_feather_tooth
+```

@@ -1,0 +1,25 @@
+---
+title: "Sample Size Planning"
+output: html_document
+---
+
+
+```{r}
+library(pwr)
+
+# based on the difference observed in the previous study
+pwr.t.test(d=(-0.2-(-0.55))/1.5,
+           power=0.8,
+           sig.level=0.05,
+           type="two.sample",
+           alternative="greater")
+```
+
+
+At least 228 subjects per condition. However, note that an additional criterion was reaching a specific estimation precision (defined as a maximum width of the 95 CIs around the group means.). Another was that equally many subjects were supposed to be in each condition:
+
+(1) no 95\%CI of the means should be wider than $0.5$ points on the rating scale and 
+
+(2) all conditions should have the same number of subjects. Both additional criteria were reached after $n~=240$ subjects, which terminated the data collection.    
+
+ These criteria were fulfilled with $n~=240$ subjects in each condition, which terminated data collection.

@@ -11,7 +11,7 @@
 
 
 
-<title>Supplementary Experiment 1</title>
+<title>Supplementary Experiment</title>
 
 <script src="site_libs/header-attrs-2.18/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
@@ -347,7 +347,13 @@ div.tocify {
       <a href="exp1b_mat.html">Experiment 1b</a>
     </li>
     <li>
-      <a href="exp2_mat.html">Experiment 2</a>
+      <a href="exp1c_mat.html">Experiment 1c</a>
+    </li>
+    <li>
+      <a href="exp2_mat.html">Experiment 2a</a>
+    </li>
+    <li>
+      <a href="exp2b_mat.html">Experiment 2b</a>
     </li>
     <li>
       <a href="exp3_mat.html">Experiment 3</a>
@@ -358,17 +364,14 @@ div.tocify {
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     <span class="glyphicon glyphicon-inbox"></span>
      
-    Supplementary Studies
+    Supplementary Study
      
     <span class="caret"></span>
   </a>
   <ul class="dropdown-menu" role="menu">
-    <li class="dropdown-header">Summary of Supplementary Studies</li>
+    <li class="dropdown-header">Summary of Supplementary Study</li>
     <li>
-      <a href="expSup1_mat.html">Supplementary Study 1</a>
-    </li>
-    <li>
-      <a href="expSup2_mat.html">Supplementary Study 2</a>
+      <a href="expSup_mat.html">Supplementary Study</a>
     </li>
   </ul>
 </li>
@@ -384,7 +387,7 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">Supplementary Experiment 1</h1>
+<h1 class="title toc-ignore">Supplementary Experiment</h1>
 
 </div>
 
@@ -404,16 +407,16 @@ body {
 <h1><span class="header-section-number">1</span> Demo Version of
 Experiment</h1>
 <p>To see a demo of the experiment in a separate browser window, click
-<a href="Supplementary_Studies/ExpSup1/experiment_files/task_local_demo/Exp_demo.html" target="_blank">here</a>.</p>
+<a href="Supplementary_Studies/ExpSup/experiment_files/task_local_demo/Exp_demo.html" target="_blank">here</a>.</p>
 <p>To download the program files of the experiment, click <a
-href="Supplementary_Studies/ExpSup2/experiment_files.zip">here</a>.</p>
+href="Supplementary_Studies/ExpSup/experiment_files.zip">here</a>.</p>
 <hr />
 </div>
 <div id="data" class="section level1" number="2">
 <h1><span class="header-section-number">2</span> Data</h1>
 <ul>
 <li><a
-href="Supplementary_Studies/ExpSup1/data_and_analyses/exp_data.zip">Download
+href="Supplementary_Studies/ExpSup/data_and_analyses/Supp_Exp_data.zip">Download
 Experimental data</a> [.csv-file; delimiter = “,”]</li>
 </ul>
 <div id="data-set-information" class="section level2" number="2.1">
@@ -421,37 +424,22 @@ Experimental data</a> [.csv-file; delimiter = “,”]</li>
 information</h2>
 <p>The data set contains the following columns:</p>
 <ul>
+<li><strong>run_id</strong> : subj identifier</li>
 <li><strong>subj_code</strong>: a random subject code</li>
-<li><strong>condition</strong>: a condition variable listing the 12
-conditions</li>
-<li><strong>desktop_conf</strong>: subjects’ confirmation of taking part
-via PC or Laptop</li>
-<li><strong>attent_conf</strong>: subjects’ confirmation to pay
-attention</li>
-<li><strong>scale_orient</strong>: counterbalancing factor coding the
-orientation of the rating scale</li>
-<li><strong>DV_rating</strong>: subjects’ selection in the test phase
-(main dV); 0 means narrow scope explanation if scale orientation is
-“narrow left”</li>
-<li><strong>Story</strong>: condition variable coding the sceneario
-subjects saw</li>
-<li><strong>LatentF</strong>: conditionv ariable coding the relaitve
-feature diagnosability of the the target features</li>
-<li><strong>explanation2</strong>: the 2nd dv asked in this study:
-subjects’ explanations of what they would have done hadn’t they been
-forced to choose between only two options.</li>
-<li><strong>narrow_check</strong>: memory check question asking for the
-defining features of the narrow scope category (hunter)</li>
-<li><strong>broad_check</strong>: memory check question asking for the
-defining features of the broad scope category (spear fisherman)</li>
-<li><strong>age</strong>: subjects’ age in year</li>
+<li><strong>disease1</strong>: counterbalancing factor listing which
+disease is mentioned first</li>
+<li><strong>effects1</strong>: counterbalacning factor listing which
+feature is mentioned first</li>
+<li><strong>scale_orientation</strong>: counterbalancing factor coding
+if narrow scope explan. was on the left or right side of the rating
+scale</li>
+<li><strong>dv_rating</strong>: subjects test case rating (main dv)</li>
+<li><strong>source</strong>: condition factor coding what information
+subjects received about the latent feature</li>
+<li><strong>explan</strong>: subjects explanation of their latent scope
+test probe rating</li>
+<li><strong>age</strong>: subjects’ age</li>
 <li><strong>gender</strong>: subjects’ gender</li>
-<li><strong>tech_issues</strong>: subjects’ report of potential
-technical problems</li>
-<li><strong>narrow_correct</strong>: column coding whether narrow_check
-was answered correctly</li>
-<li><strong>broad_ocrrect</strong>: column coding whether broad_check
-was answered correctly</li>
 </ul>
 <hr />
 </div>
@@ -460,13 +448,13 @@ was answered correctly</li>
 <h1><span class="header-section-number">3</span> Analysis Script</h1>
 <ul>
 <li><a
-href="Supplementary_Studies/ExpSup1/data_and_analyses/Exp_Analysis.Rmd">View
+href="Supplementary_Studies/ExpSup/data_and_analyses/SuppExp_Analysis.Rmd">View
 R-Markdown code</a></li>
 <li><a
-href="Supplementary_Studies/ExpSup1/data_and_analyses/Exp_Analysis.zip">Download
+href="Supplementary_Studies/ExpSup/data_and_analyses/SuppExp_Analysis.zip">Download
 R-Markdown code</a></li>
 <li><a
-href="Supplementary_Studies/ExpSup1/data_and_analyses/Exp_Analysis.html">View
+href="Supplementary_Studies/ExpSup/data_and_analyses/SuppExp_Analysis.html">View
 knitted/ compiled R-Markdown</a> (web view of analysis)</li>
 </ul>
 <hr />
@@ -474,42 +462,40 @@ knitted/ compiled R-Markdown</a> (web view of analysis)</li>
 <div id="description-of-the-study" class="section level1" number="4">
 <h1><span class="header-section-number">4</span> Description of the
 study</h1>
-<p>This study (<span class="math inline">\(N~= 252\)</span>) replicated
-the findings of Experiment~1b with three additional (fictitious) test
-scenarios. Two versions of each scenario were tested. In one, both
-category features had about equal diagnosability. In the other, the
-status of the latent feature was harder to determine than that of the
-evident feature. The goal was to demonstrate that the findings of
-Experiment~1b that document an influence of relative feature
-diagnosability generalize to other scenarios. One scenario was about a
-newly discovered species of desert plant (the Desert Daisy). Two
-sub-types were described (Type A and Type B), that were described to
-occur equally frequent. Both sub-types shared the feature “pearly white
-blossom”. The second feature varied between conditions. In the condition
-in which both features had similar diagnosability, the unique feature
-(the latent feature in the test case) was “thick green leaves”. In the
-condition in which the latent feature was harder to observe, it was
-“venomous liquid in its stem”. The structure of all three different
-scenarios was identical. The second scenario was about a rare stamp (the
-“Queen of the Caribbean”). The feature pairs in the condition with
-similar diagnosability were “ultramarine” (evident feature in the test
-case) and “yellow margin” (latent feature in the test case). In the
-other condition the latent feature was “yellow sticky back”. The third
-scenario was about Swiss watch (the “Weissentanner”). The shared feature
-in both diagnosability conditions was “little Swiss flag on the dial”.
-The latent features were “red digits” (similar visibility condition)
-vs. “red battery cover on its back” (condition where latent feature is
-harder to see). In the test phase, for all scenarios an exemplar was
-described in which the information about the latent feature read “you
-don’t know whether it also has [the unique feature] or not”. Subjects
-then rated to which category the exemplar most likely belongs to.</p>
+<p>This study (<span class="math inline">\(N~= 144\)</span>) further
+tested the influence of pragmatic factors using an experimental scenario
+similar to one tested in . The goal of this study was to test how the
+way the information about the latent feature is presented influences
+pragmatic assumptions about the feature’s state. Subjects learned about
+two different, equally frequent, gene mutations leading to abnormal
+levels of certain blood substances. One mutation had two effects and the
+other one only of these two effects. In the test phase, subjects
+received information about a patient known to have one of the two
+mutations. To get a diagnosis, blood tests were ordered, but only the
+presence of the undiagnostic symptom could be established. Different
+conditions varied what information was given about the latent (unique)
+symptom. In one condition, the status of the unique symptom was not
+mentioned at all (like in Experiment~1). In another, it was said that
+its status was ``uknown’’ (also like in Experiment~1). These conditions
+warrant the pragmatic assumption that this feature is more likely
+absent, especially the condition in which the feature was not mentioned
+at all. In a third condition, a reason was provided for why the latent
+feature’s status was unknown. Crucially, this reason was supposed to be
+pragmatically unrelated (i.e., undiagnostic) to the symptom’s status:
+Subjects read that a cup of coffee was accidentally spilled over the
+printout listing the results of the patient’s blood tests. As a result,
+the results for the latent (diagnostic) symptom were not readable. It
+was predicted that subjects’ tendency to show a bias should be minimal
+in this condition because a stain of coffee that accidentally prevents
+the assessment of the latent feature’s status should be seen as
+unrelated to its status.</p>
 <div id="method" class="section level2" number="4.1">
 <h2><span class="header-section-number">4.1</span> Method</h2>
 <div id="participants" class="section level3" number="4.1.1">
 <h3><span class="header-section-number">4.1.1</span> Participants</h3>
-<p>Two hundred and fifty-two subjects (<span
-class="math inline">\(M_{age}\,= 39\)</span>, <span
-class="math inline">\(SD_{age}\,= 13.65\)</span>, age range 18 to 74
+<p>One hundred and forty-four subjects (<span
+class="math inline">\(M_{age}\,= 35.34\)</span>, <span
+class="math inline">\(SD_{age}\,= 13.48\)</span>, age range 19 to 78
 years) recruited via the online platform participated in this online
 study and provided valid data. The inclusion criteria were a minimum age
 of 18 years, English as first language, and an approval rate (concerning
@@ -519,131 +505,142 @@ written instructions, prolific workers with “no formal qualifications”
 for the criterion “highest education level completed” were excluded from
 participation. Subjects also were asked to take part via PC or Laptop,
 and not via Tablet or Smartphone.</p>
-<p>The study was planned for precision. The stopping rule for data
-collection was that no 95% CI of the group means for the three scenarios
-should be wider than 1.0. There should also be equally many subjects in
-each conditions. This criterion was reached after 42 subjects per
-condition.</p>
 </div>
 <div id="design-materials-and-procedure" class="section level3"
 number="4.1.2">
 <h3><span class="header-section-number">4.1.2</span> Design, materials,
 and procedure</h3>
-<p>The study had two main factors, which were manipulated between
-subjects. One was relative feature diagnosability, which had two levels
-(both features similar vs. latent feature harder to diagnose). The other
-factor was the scenario, which had three levels (Flower vs. Stamp
-vs. Watch). An additional counterbalancing factor was the orientation of
-the rating scale shown in the test phase (narrow scope explanation on
-left side vs. right side). This led to a total of 12 between-subjects
-conditions. The procedure was largely identical to the procedure of
-Experiment~1b. Readers may use the link to the demo of the study.</p>
-<p>The different scenario descriptions in the different “relative
-feature diagnosability” conditions were (with the features in the
-condition in which the latent feature was harder to diagnose in []):</p>
-<p><u>Desert Daisy</u>:</p>
+<p>Subjects were alternately assigned to one of three theoretically
+relevant conditions, which manipulated what information about the latent
+feature was presented in the test phase (no information vs. “you don’t
+know” vs. “unreadable”). There were several counterbalancing factors
+that will be described in more detail below. To see a demo of the
+experiment, click <a
+href="Supplementary_Studies/ExpSup/experiment_files/task_local_demo/Exp_demo.html">here</a>.</p>
+<p>Subjects read the following medica scenario about two gene mutations
+alatering blood substances:</p>
 <blockquote>
-<p>In the desert region of Al Amanur between China and Mongolia,
-botanists recently discovered a new kind of plant, the Desert Daisy.
-There are two subtypes of the Desert Daisy, Type A and Type B. Both
-occur equally often. Desert Daisy Type A has a pearly white blossom.
-Desert Daisy Type B also has a pearly white blossom, but unlike Desert
-Daisy Type A, it also has thick green leaves [it also has a venomous
-liquid in its stem].</p>
-You’re on a trip through Al Amanur desert and come across a Desert Daisy
-that has a pearly white blossom, but you don’t know whether it also has
-thick green leaves [the venomous liquid in its stem] or not.
+<p><i>Please read the following fictitious scenario thoroughly:</i></p>
+<p>Imagine that you are a doctor. Below is some information about two
+diseases, Vilosa and Pylium.</p>
+<ul>
+<li>Vilosa always causes abnormal Gludon blood levels.</li>
+<li>Pylium always causes abnormal Gludon and Lian blood levels.</li>
+</ul>
+<p>Below you see a graphical illustration of the effects of the two
+diseases.</p>
+<p><img
+src="Supplementary_Studies/ExpSup/experiment_files/task_local_demo/img/nets_Vilosa_Gludon.png" />
+- Vilosa and Pylium occur equally often.</p>
+<ul>
+<li>A study of 1000 people found that 250 of them had abnormal Lian
+levels.</li>
+</ul>
 </blockquote>
-<p><u>Queen of the Caribbean</u>:</p>
-<blockquote>
-<p>In the world of stamp collectors, the holy grail for any collector is
-a stamp called “Queen of the Caribbean”. There are two subtypes of this
-stamp, Type A and Type B. Both occur equally often. Queen of the
-Caribbean Type A is ultramarine. Queen of the Caribbean Type B also is
-ultramarine, but unlike Queen of the Caribbean Type A, it also has a
-yellow margin [sticky backside that is yellow].</p>
-You’re on a flea market and come across an old postcard with a Queen of
-the Caribbean on it. The stamp is ultramarine, but you don’t know
-whether it also has a yellow margin [a yellow sticky back].
-</blockquote>
-<p><u>Weissentanner</u>:</p>
-<blockquote>
-<p>In the valley of Weissentann in Switzerland a watch manufacturer
-produces a kind of watch that is the dream of any watch lover. It’s
-called the “Weissentanner”. There are two subtypes of the Weissentanner,
-Type A and Type B. Both are produced in equal numbers and are equally
-expensive, which is why both types are found equally often.
-Weissentanner Type A has a little Swiss flag on its dial. Weissentanner
-Type B also has a little Swiss flag on its dial, but unlike
-Weissentanner Type A, it also has red digits [a red battery cover on its
-back].</p>
-You’re on a train through the valley of Weissentann and you realize that
-the person sitting next to you is wearing a Weissentanner. The watch has
-the little Swiss flag on its dial but you don’t know whether it also has
-red digits [a red battery cover on its back].
-</blockquote>
-<p>In each scenario, subjects answered the following test question:</p>
-<blockquote>
-<p>To which category of [Desert Daisy; Queen of the Caribbean;
-Weissentanner] do you think this [flower; stamp; watch] belongs to?</p>
-</blockquote>
-<p>Subjects provided their ratings on an eleven-point rating scale with
-the endpoint labeled “Definitely Type A”, the midpoint labeled “50:50
-(both equally likely)” and the other endpoint labeled “Definitely Type
-B”. The orientation of the scale was counterbalanced between
+<p>Whether the single-effect cause was labeled Vilosa or Pylium was
+counterbalanced between subjects. Whether the effect of the
+single-effect cause was Gludon or Lian was also counterbalanced between
 subjects.</p>
-<p>Subjects also provided brief open-ended explanations of their
-ratings. They then were asked two memory check questions and only the
-data of subjects who responded correctly to both question were recorded
-for analyses. The memory check probed the defining features of the two
-types of entities presented in the scenario (run Demo of the experiment
-to see the memory checks. To run the demo, click <a
-href="Supplementary_Studies/ExpSup1/experiment_files/task_local_demo/Exp_demo.html">here</a>).</p>
-<p>Subjects provide demographic information, were given the chance to
-report technical complications they may have experienced, and then ended
-the study on a short debriefing screen.</p>
+<p>On the same screen below the description, subjects were asked a
+number of comprehension check questions. Only the data of subjects whor
+responded correctly to these questions were recorded for analyses. Run
+the demo of the experiment to see these questions.</p>
+<p>In the test phase, subjects were presented with the following
+situation:</p>
+<blockquote>
+<p><i>As a reminder, below you see again the graphs showing the effects
+of the two diseases.</i></p>
+<p><img
+src="Supplementary_Studies/ExpSup/experiment_files/task_local_demo/img/nets_Vilosa_Gludon.png" /></p>
+<p><i>Please imagine the following scenario:</i></p>
+<p>One of your patients, Patient #890, definitely has either Vilosa or
+Pylium, but you aren’t sure which. Therefore, you ordered blood tests
+for the patient. The tests confirmed that the patient has abnormal
+levels of Gludon.</p>
+Which disease do you think Patient #890 is most likely to have?
+</blockquote>
+<p>The scenario description above is the one from the condition in which
+the latent feature was not mentioned at all in the description of the
+patient. In the condition in which the latent feature’s status was
+described as “unknown”, subjects read:</p>
+<blockquote>
+<p>You don’t know whether the patient’s Lian levels are normal or
+abnormal.</p>
+</blockquote>
+<p>And in the condition in which a plausible reason for ignorance about
+the latent feature’s status was given that was supposed to be unrelated
+to the latent feature’s status, subjects read:</p>
+<blockquote>
+The letter with the results has just come back. Unfortunately, you
+accidentally spill your cup of coffee over the document and now only
+part of it is still readable. From what is still readable, you can see
+that Patient #890 indeed has abnormal levels of Gludon. However, due to
+a big stain of coffee right where the results for the Lian levels are
+printed, you cannot see whether or not the Patient #890 also has
+abnormal levels of Lian.
+</blockquote>
+<p>Subjects provided their answer on an eleven-point rating scale whose
+endpoints were labeled “Definitely Vilosa” and “Definitely Pylium”. The
+orientation of the scale was counterbalanced between subjects. The
+scale’s midpoint was labeled “50:50 (both equally likely)”.</p>
+<p>Subjects also provided explanations of their ratings on the following
+screen. They then provided demographic data, were given the opportunity
+to report any technical issues, and ended the study on a short
+debriefing screen.</p>
 </div>
 </div>
 <div id="results-and-discussion" class="section level2" number="4.2">
 <h2><span class="header-section-number">4.2</span> Results and
 discussion</h2>
-<p>A figure that shows subjects ratings in the three different scenarios
-is shown below (squares are means, “+” are medians, error bars are 95%
-CIs of the means, jittered dots show subjects’ ratings and violin plots
-their distributions):</p>
+<p>Subjects’ ratings are summarized in the graph below:</p>
 <p><img
-src="Supplementary_Studies/ExpSup1/data_and_analyses/results_scen_means_mainDV.svg" /></p>
-<p>Subjects tended to prefer the narrow latent scope explanation if both
-features had similar diagnosability (although there was no difference in
-the watch scenario). Averaging over the scenarios, the following graph
-shows the difference between these two theoretically relevant conditions
-(squares are means, “+” are medians, error bars are 95% CIs of the
-means, jittered dots show subjects’ ratings and violin plots their
-distributions):</p>
-<p><img
-src="Supplementary_Studies/ExpSup1/data_and_analyses/results_means_mainDV.svg" />
+src="Supplementary_Studies/ExpSup/data_and_analyses/results_means.svg" />
 <br></p>
-<p>All statistical parameters and tests can be found in the knitted
-R-Markdown Analysis file, which can be accessed <a
-href="Supplementary_Studies/ExpSup1/data_and_analyses/Exp_Analysis.html">here</a>.
-The analysis revealed that the means in these two conditions were
-different from each other, which corroborates the hypothesis that
-relative feature diagnosability influences subjects’ preferences.</p>
-<p>The graphs also show that narrow latent scope biases were exhibited
-only by a subgroup of subjects. A graph showing the different categories
-of subject responses (and their proportions) is shown below:</p>
+<p>As can be seen in the graph, most subjects in all conditions were
+unbiased. Also, most subjects who showed a narrow latent scope
+preference were in the “no info” (<span class="math inline">\(M~=
+-0.83\)</span>, 95% CI [<span class="math inline">\(-1.3\)</span>, <span
+class="math inline">\(-0.40\)</span>]) and the “don’t know” (<span
+class="math inline">\(M~=-0.54\)</span>, 95% CI [<span
+class="math inline">\(-1.04\)</span>, <span
+class="math inline">\(-0.10\)</span>]) conditions. In the “unreadable”
+condition, where an explanation for the unknown state of the relevant
+feature was provided that shouldn’t allow any pragmatic conclusions
+about the feature’s actual status, almost all subjects responded
+correctly (<span class="math inline">\(M~= -0.17\)</span>, 95% CI [<span
+class="math inline">\(-0.46\)</span>, <span
+class="math inline">\(0.10\)</span>]). A polynomial contrast analysis
+over these three means revealed a significant linear trend,
+estimate~<span class="math inline">\(= 0.47\)</span>, <span
+class="math inline">\(t(141)~= 2.13\)</span>, <span
+class="math inline">\(p~&lt; .03\)</span>. No other trend was
+significant. This analysis confirms that the observed narrow latent
+scope biases tend to decrease from the “no info” over the “‘don’t know’”
+to the “unreadable” condition.</p>
+<p>This study complements Experiment~1b, as it demonstrates that
+previous studies might have overestimated genuine narrow latent scope
+biases because they didn’t sufficiently control for pragmatic reasons
+that render the narrow latent scope explanation more probable.</p>
+<p>As in previous studies, subjects’ ratings were also categorized into
+the three different possible behaviors. The proportions in each of the
+behavior categories are shown below:</p>
 <p><img
-src="Supplementary_Studies/ExpSup1/data_and_analyses/categories.svg" />
+src="Supplementary_Studies/ExpSup/data_and_analyses/categories.svg" />
 <br></p>
-<p>All in all the results of this additional study complement the
-findings of Experiment~1b and lead to the conclusion that past studies
-who tested features with similar relative feature diagnosability tended
-to overestimate genuine narrow latent scope biases. The reason is that
-under conditions of similar relative feature diagnosability, subjects’
-preference for the narrow latent scope explanation may be pragmatically
-warranted: observing one feature but not knowing the status of another
-that should be as easy to see is more likely to happen in a world in
-which that latent feature is actually absent.</p>
+<p>As can be seen, the highest proportion of unbiased ratings was
+observed in the “unreadable” condition, where it was supposed to be
+clear that the reason why the unobserved symptom was unobserved had
+nothing to do with its actual status. Also, the proportions of subjects
+who preferred the narrow latent scope explanation were lowest in the
+“unreadable” condition. Two 2-sample tests for equality of proportions
+without continuity correction tests confirmed that the proportion of
+narrow latent scope biases was lower in the “unreadable” condition than
+in each of the other two conditions, <span
+class="math inline">\(\chi^2(1)~= 4.04\)</span>, <span
+class="math inline">\(p~= 0.022\)</span> (one-sided; “unreadable”
+vs. “‘don’t know’”), and <span class="math inline">\(\chi^2(1)~=
+3.22\)</span>, <span class="math inline">\(p~= 0.036\)</span>
+(one-sided).</p>
 </div>
 </div>
 

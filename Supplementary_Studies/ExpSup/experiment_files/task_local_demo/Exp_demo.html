@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Demo Exp</title>
+    <script src="jspsych/jspsych.js"></script>
+    <script src="jspsych/plugin-html-button-response.js"></script>
+    <script src="jspsych/plugin-survey-multi-choice.js"></script>
+    <script src="jspsych/plugin-survey-likert.js"></script>
+    <script src="jspsych/plugin-html-slider-response.js"></script>
+	<script src="jspsych/plugin-image-keyboard-response.js"></script>
+	<script src="jspsych/plugin-html-keyboard-response.js"></script>
+    <script src="jspsych/plugin-preload.js"></script>
+    <script src="jspsych/plugin-survey-text.js"></script>
+    <link href="jspsych/jspsych.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body></body>
+  <script>
+  
+// run study with ?demo=true at the end of url to have the demo mode
+
+
+var jsPsych = initJsPsych({
+  experiment_width: 1000,
+  on_finish: function(){
+    window.location = "https://app.prolific.co/submissions/complete?cc=136BDB5F"
+  }
+});
+
+
+//var condition = CONDITION; 
+var condition;
+
+jsPsych.data.addProperties({condition: +condition});
+
+var subj_code;
+
+function makeid(length) {
+    var result           = '';
+    var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var charactersLength = characters.length;
+    for ( var i = 0; i < length; i++ ) {
+      result += characters.charAt(Math.floor(Math.random() * 
+ charactersLength));
+   }
+   return result;
+}
+
+subj_code = makeid(12);
+
+console.log(subj_code);
+
+jsPsych.data.addProperties({subj_code: subj_code});
+
+
+
+/* create timeline */
+var timeline = [];
+
+/* preload images */
+var preload = {
+  type: jsPsychPreload,
+  images: ['img/uni_org_color_li.png']
+}
+timeline.push(preload);
+
+var styles = `
+  p {
+    text-align: justify
+  }
+  
+`
+var styleSheet = document.createElement("style")
+styleSheet.type = "text/css"
+styleSheet.innerText = styles
+document.head.appendChild(styleSheet)
+
+
+//////////////////////// images in the different conditions
+
+console.log(condition)
+
+var mut1; 
+var mut2; 
+
+var effects1; 
+var effects2;
+
+var mut1_col; 
+var mut2_col; 
+
+var net;
+var icons;
+
+var likert_scale; 
+var scale_orientation;
+
+
+//////////////////////////////////////////////////////
+/* Condition selection (just for offline demo) */
+
+var select = {
+  type: jsPsychSurveyText,
+  questions: [
+    {
+		prompt: 
+		`
+		<p><b>This study is in demo mode. Select a condition: type in a number between 1 and 24.</b></p>
+    <p>
+      - 1 - 4 & 13 - 16: no info about latent feature<br>
+      - 5 - 8 & 17 - 20: "you don't know"<br>
+      - 9 - 12 & 21 - 24: "unreadable"<br>
+    </p>
+		`, 
+		placeholder: 'number between 1 and 24',
+		required: true,
+		name: 'CondSel',
+	},
+  ],
+	on_finish: function(data){
+	condition = data.response.CondSel,
+	console.log(condition);
+	} 
+}
+timeline.push(select);
+
+
+
+//////////////////////////////////////////////////////
+/* Instructions ( all conditions)  */
+var cond_selected = {
+    type: jsPsychHtmlButtonResponse,
+    stimulus: function () {
+    return "You chose to see Condition "+condition;
+		},
+    choices: ['Continue']
+};
+//timeline.push(cond_selected);
+
+
+
+
+
+
+//////////////////////////////////////////////////////
+/* Confirmations */
+var confs = {
+  type: jsPsychSurveyMultiChoice,
+  questions: [
+    {
+      prompt: "This study works properly only on Desktop PCs and Laptops, and not on Smartphones or Tablets. Before you proceed, please confirm that you take part via Desktop PC or Laptop.", 
+      name: 'DesktopConf', 
+      options: ['1: I confirm', '2: I do not confirm'], 
+      required: true
+    }, 
+    {
+      prompt: "For the scientific utility of the results, it is very important that you provide complete and careful responses. How seriously will you take your participation in the study?", 
+      name: 'AttentConf', 
+      options: ['1: I will take it seriously', '2: I will not take it seriously'], 
+      required: true
+    }, 
+  ],
+  on_finish: function(data){
+    if (condition == 1 || condition == 5 || condition == 9) {
+        mut1 = "Vilosa"; 
+        mut2 = "Pylium"; 
+        effects1 = "Gludon"; 
+        effects2 = "Lian"; 
+        net = "nets_Vilosa_Gludon.png";
+        likert_scale = ["Definitely Vilosa", " ", " ", " ", " ", "50:50 (both equally likely)", " ", " ", " ", " ", "Definitely Pylium"];
+        scale_orientation = "narrow_left";
+      } else if (condition == 2 || condition == 6 || condition == 10) {
+        mut1 = "Vilosa"; 
+        mut2 = "Pylium"; 
+        effects1 = "Lian"; 
+        effects2 = "Gludon";
+        net = "nets_Vilosa_Lian.png";
+        likert_scale = ["Definitely Vilosa", " ", " ", " ", " ", "50:50 (both equally likely)", " ", " ", " ", " ", "Definitely Pylium"];
+        scale_orientation = "narrow_left";
+      } else if (condition == 3 || condition == 7 || condition == 11) {
+        mut1 = "Pylium"; 
+        mut2 = "Vilosa"; 
+        effects1 = "Gludon"; 
+        effects2 = "Lian"; 
+        net = "nets_Pylium_Gludon.png";
+        likert_scale = ["Definitely Vilosa", " ", " ", " ", " ", "50:50 (both equally likely)", " ", " ", " ", " ", "Definitely Pylium"];
+        scale_orientation = "narrow_right";
+      } else if (condition == 4 || condition == 8 || condition == 12) {
+        mut1 = "Pylium"; 
+        mut2 = "Vilosa"; 
+        effects1 = "Lian"; 
+        effects2 = "Gludon";
+        net = "nets_Pylium_Lian.png";
+        likert_scale = ["Definitely Vilosa", " ", " ", " ", " ", "50:50 (both equally likely)", " ", " ", " ", " ", "Definitely Pylium"];
+        scale_orientation = "narrow_right";
+      } else if (condition == 13 || condition == 17 || condition == 21) {
+        mut1 = "Vilosa"; 
+        mut2 = "Pylium"; 
+        effects1 = "Gludon"; 
+        effects2 = "Lian"; 
+        net = "nets_Vilosa_Gludon.png";
+        likert_scale = ["Definitely Pylium", " ", " ", " ", " ", "50:50 (both equally likely)", " ", " ", " ", " ", "Definitely Vilosa"];
+        scale_orientation = "narrow_right";
+      } else if (condition == 14 || condition == 18 || condition == 22) {
+        mut1 = "Vilosa"; 
+        mut2 = "Pylium"; 
+        effects1 = "Lian"; 
+        effects2 = "Gludon";
+        net = "nets_Vilosa_Lian.png";
+        likert_scale = ["Definitely Pylium", " ", " ", " ", " ", "50:50 (both equally likely)", " ", " ", " ", " ", "Definitely Vilosa"];
+        scale_orientation = "narrow_right";
+      } else if (condition == 15 || condition == 19 || condition == 23) {
+        mut1 = "Pylium"; 
+        mut2 = "Vilosa"; 
+        effects1 = "Gludon"; 
+        effects2 = "Lian"; 
+        net = "nets_Pylium_Gludon.png";
+        likert_scale = ["Definitely Pylium", " ", " ", " ", " ", "50:50 (both equally likely)", " ", " ", " ", " ", "Definitely Vilosa"];
+        scale_orientation = "narrow_left";
+      } else if (condition == 16 || condition == 20 || condition == 24) {
+        mut1 = "Pylium"; 
+        mut2 = "Vilosa"; 
+        effects1 = "Lian"; 
+        effects2 = "Gludon";
+        net = "nets_Pylium_Lian.png";
+        likert_scale = ["Definitely Pylium", " ", " ", " ", " ", "50:50 (both equally likely)", " ", " ", " ", " ", "Definitely Vilosa"];
+        scale_orientation = "narrow_left";
+      };
+      icons = "icons.png";
+	  jsPsych.data.addProperties({desktop_conf: data.response.DesktopConf, attent_conf: data.response.AttentConf, Mutation1: mut1, Effects1: effects1, scale_orient: scale_orientation});
+  },
+  preamble: `
+              <p><img src="img/uni_org_color_li.png" width = 100%></img></p>
+              <p><b>Welcome to this experiment and thank you very much for your participation.</b></p>
+              <p>Please note: This study contains memory and comprehension checks with which we aim to ensure that you correctly understood the central aspects of the study.</p>
+            `
+};
+timeline.push(confs);
+
+
+
+//////////////////
+/* instr */ 
+var instr_check = {
+  type: jsPsychSurveyMultiChoice,
+  name: 'instr_check',
+  questions: [
+    {
+      prompt: "<b>What is correct about the effects of the two diseases?</b>", 
+      options: ['1: One disease always causes only abnormal Gludon levels, the other disease always causes abnormal Gludon and Lian levels.', 
+                '2: One disease always causes only abnormal Lian levels, the other disease always causes abnormal Lian and Gludon levels.'],
+      required: true,
+      name: 'effects_check'
+    },
+    {
+      prompt: "<b>What is correct about the frequency with which the two diseases occur in the population?</b>", 
+      options: ['1: Both diseases occur equally often.', 
+                '2: One disease is more frequent than the other.'],
+      required: true,
+      name: 'prev_check'
+    },
+    {
+      prompt: function() {return `<b>What is correct about the results of the study that tested the `+effects2+` levels in 1000 people?</b>`}, 
+      options: [function() {return `1: It was found that out of 1000 people 950 had abnormal levels of `+effects2+`.`}, 
+                function() {return `2: It was found that out of 1000 people 250 had abnormal levels of `+effects2+`.`}],
+      required: true,
+      name: 'eff2_check'
+    },
+  ],
+
+  preamble: function() {return `
+    <p><i>Please read the following fictitious scenario thoroughly:</i></p>        
+        
+        <p>Imagine that you are a doctor. Below is some information about two diseases, <b>`+mut1+`</b> and <b>`+mut2+`</b>.</p>
+
+        <p>- `+mut1+` always causes abnormal <b>`+effects1+`</b> blood levels.<br>
+           - `+mut2+` always causes abnormal <b>`+effects1+`</b> and <b>`+effects2+`</b> blood levels.</p>
+
+        <p>Below you see a graphical illustration of the effects of the two diseases.</p>
+        
+        <p style="text-align:center;"><img src="img/`+net+`" width = 50%></img></p>
+
+        <p>- `+mut1+` and `+mut2+` occur equally often.</p>
+
+        <p>- A study of 1000 people found that 250 of them had abnormal `+effects2+` levels.</p>
+
+        <br>
+
+        <hr style="width:100%;text-align:left;margin-left:0">
+
+        <p><i>You have now learned the relevant information about the two diseases. Before you proceed, please answer the comprehension check questions below.</i></p>
+    `
+  },
+  on_finish: function(data){
+	  jsPsych.data.addProperties({effects_check: data.response.effects_check, prevalence_check: data.response.prev_check, effect2_check: data.response.eff2_check});
+  },
+};
+timeline.push(instr_check);
+
+
+////////////////////////////// Instructing the Decision Situation 
+
+var no_info = {
+  type: jsPsychSurveyLikert,
+  questions: [
+    {prompt: function() {return `<b>Which mutation do you think the patient has?</b> Please use the scale below to provide a judgment.`}, name: 'rating', labels: function () {return likert_scale}},
+  ],
+  randomize_question_order: false,
+  preamble: function() {
+    return `                 
+        <p><i>As a reminder, below you see again the graphs showing the effects of the two diseases.</i></p>
+
+        <p style="text-align:center;"><img src="img/`+net+`" width = 50%></img></p>
+
+        <p><i>Please imagine the following scenario:</i></p>
+
+        <p>One of your patients, Patient #890, definitely has either Vilosa or Pylium, but you aren't sure which. Therefore, you ordered blood tests for the patient. 
+          The tests confirmed that the patient has abnormal levels of `+effects1+`.</p>
+
+        <p>Which disease do you think Patient #890 is most likely to have?</p>
+    `
+  },
+  on_finish: function(data){
+    source = "no_info";
+	  jsPsych.data.addProperties({DV_rating: data.response.rating, source: source});
+  },
+};
+
+var ign_info = {
+  type: jsPsychSurveyLikert,
+  questions: [
+    {prompt: function() {return `<b>Which mutation do you think the patient has?</b> Please use the scale below to provide a judgment.`}, name: 'rating', labels: function () {return likert_scale}},
+  ],
+  randomize_question_order: false,
+  preamble: function() {
+    return `                 
+        <p><i>As a reminder, below you see again the graphs showing the effects of the two diseases.</i></p>
+
+        <p style="text-align:center;"><img src="img/`+net+`" width = 50%></img></p>
+
+        <p><i>Please imagine the following scenario:</i></p>
+
+        <p>One of your patients, Patient #890, definitely has either Vilosa or Pylium, but you aren't sure which. Therefore, you ordered blood tests for the patient. 
+          The tests confirmed that the patient has abnormal levels of `+effects1+`. You don't know whether the patient's `+effects2+` levels are normal or abnormal.</p>
+
+        <p>Which disease do you think Patient #890 is most likely to have?</p>
+    `
+  },
+  on_finish: function(data){
+    source = "none";
+	  jsPsych.data.addProperties({DV_rating: data.response.rating, source: source});
+  },
+};
+
+
+var expl_info = {
+  type: jsPsychSurveyLikert,
+  questions: [
+    {prompt: function() {return `<b>Which mutation do you think the patient has?</b> Please use the scale below to provide a judgment.`}, name: 'rating', labels: function () {return likert_scale}},
+  ],
+  randomize_question_order: false,
+  preamble: function() {
+    return `                 
+        <p><i>As a reminder, below you see again the graphs showing the effects of the two diseases.</i></p>
+
+        <p style="text-align:center;"><img src="img/`+net+`" width = 50%></img></p>
+
+        <p><i>Please imagine the following scenario:</i></p>
+
+        <p>One of your patients, Patient #890, definitely has either Vilosa or Pylium, but you aren't sure which. Therefore, you ordered blood tests for the patient. 
+          The letter with the results has just come back. Unfortunately, you accidentally spill your cup of coffee over the document and now only part of it is still readable. 
+          From what is still readable, you can see that Patient #890 indeed has abnormal levels of `+effects1+`. However, due to a big stain of coffee right where the results for 
+          the `+effects2+` levels are printed, you cannot see whether or not the Patient #890 also has abnormal levels of `+effects2+`.
+
+        <p>Which disease do you think Patient #890 is most likely to have?</p>
+    `
+  },
+  on_finish: function(data){
+    source = "expl_info";
+	  jsPsych.data.addProperties({DV_rating: data.response.rating, source: source});
+  },
+};
+
+
+var cond_no_info = {
+  timeline: [no_info],
+  conditional_function: function () {
+    if (condition <= 4) {
+      return true; 
+    } else if (condition >= 13 && condition <= 16) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+}
+
+var cond_ign_info = {
+  timeline: [ign_info],
+  conditional_function: function () {
+    if (condition >=5 && condition <= 8) {
+      return true; 
+    } else if (condition >= 17 && condition <= 20) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+}
+
+var cond_expl_info = {
+  timeline: [expl_info],
+  conditional_function: function () {
+    if (condition >= 9 && condition <= 12) {
+      return true; 
+    } else if (condition >= 21 && condition <= 24) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+}
+
+timeline.push(cond_no_info, cond_ign_info, cond_expl_info);
+
+
+
+/////////////////////////////////////// explanation
+var explan = {
+  type: jsPsychSurveyText,
+  name: 'Free_explan',
+  questions: [
+    {prompt: `We'd now like to learn a little bit more about the judgment you just made. Please use the text field below to give a short explanation for your rating.`, 
+    rows: 10, 
+    columns: 100, 
+    required: false,
+    name: 'Explanation'
+    },
+  ],
+  on_finish: function(data){
+	  jsPsych.data.addProperties({explanation: data.response.Explanation});
+  },
+}
+timeline.push(explan);
+
+
+
+/////////////////////////////////////// demographics
+var demogr_age = {
+  type: jsPsychSurveyText,
+  name: 'Age_query',
+  questions: [
+    {prompt: 'How old are you?', 
+    placeholder: 'Age as a number', 
+    required: true,
+    name: 'Age'
+    },
+  ],
+  on_finish: function(data){
+	  jsPsych.data.addProperties({age: data.response.Age});
+  },
+}
+
+
+
+var demogr_gender = {
+  type: jsPsychSurveyMultiChoice,
+  name: 'gender_query',
+  questions: [
+    {
+      prompt: "Please indicate with which gender you identify.", 
+      options: ['1: male', '2: female', '3: non-binary', '4: prefer not to say'],
+      required: true,
+      name: 'Gender'
+    },
+  ],
+  on_finish: function(data){
+	  jsPsych.data.addProperties({gender: data.response.Gender});
+  },
+};
+timeline.push(demogr_age, demogr_gender);
+
+
+
+
+/////////////////////////////////////// technical issues
+var tech_issues = {
+  type: jsPsychSurveyText,
+  name: 'Tech_issue_query',
+  questions: [
+    {prompt: 'In the text field below you can report any errors that you came across during the study (e.g., technical issues, layout problems, spelling errors, errors in program logic and flow, etc.).', 
+    rows: 10, 
+    columns: 100, 
+    required: false,
+    name: 'Tech_issue_report'
+    },
+  ],
+  on_finish: function(data){
+	  jsPsych.data.addProperties({tech_issues: data.response.Tech_issue_report});
+	  console.log(data.response.Tech_issue_report)
+  },
+}
+timeline.push(tech_issues);
+
+///////////////////////////////////// debriefing
+
+var debriefing = {
+  type: jsPsychHtmlButtonResponse,
+  stimulus: 
+    `
+    <img src="img/uni_org_color_li.png" width = 100%></img>
+    <p><b>Thank you for taking part in this study!</b></p>
+  
+    <p>The aim of this experiment is to find out more about how people reason about explanations. 
+    If you are interested in further details or if you have any questions or comments concerning the experiment, 
+    feel free to contact me (ANONYMIZED RESEARCHER) under <i>ANONYMIZED E-MAIL</i>
+    
+    <p>To ensure you receive your reward, please click the button below to return to the Prolific website:</p>
+    `
+    ,
+    choices: ['Finish study']
+};
+timeline.push(debriefing);
+
+
+
+/////////////////////////////////////////////////////////////////
+/* start the experiment */
+    jsPsych.run(timeline);
+
+  
+  </script>
+</html>

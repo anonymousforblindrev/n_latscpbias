@@ -1,0 +1,534 @@
+---
+title: "Explanation Analysis"
+output:  
+  html_document:
+    self_contained: yes
+    number_sections: true
+    toc: true  
+    collapsed: false
+    toc_float: true
+    smooth_scroll: false
+    toc_depth: 3
+---
+
+```{r setup, include=FALSE}
+# packages
+library(ez)
+library(reshape2)
+library(reshape)
+library(ggplot2)
+library(plyr)
+library(pastecs)
+library(ez)
+library(data.table)
+library(tidyverse) 
+
+library(showtext)
+library(readr)
+library(dplyr)
+library(scales)
+
+font_add_google("Poppins", "Poppins")
+font_add_google("Roboto Mono", "Roboto Mono")
+showtext_auto()
+```
+
+
+# Analysis of subjects' explanations
+
+## What subjects would have done if they hadn't been forced to make a choice
+
+```{r}
+library(readr)
+explan_data <- read_delim("subjects_explanations_analysis_main.csv", 
+    delim = ";", escape_double = FALSE, trim_ws = TRUE)
+
+
+colnames(explan_data)[3]  <- "different_explanation"        # subjects who gave an explanation that seemed to have nothing to do with visibility 
+colnames(explan_data)[4]  <- "no_explanation"               # subjects who either gave no explanation for what they would do, or their explanation was unclear
+colnames(explan_data)[5]  <- "misunderstood_scenario"       # subjects who wrote something that indicates that they didn't understand the scenario correctly
+colnames(explan_data)[6]  <- "equally_likely"               # subjects who wrote explanations saying that 50:50 would have been their preferred answer
+colnames(explan_data)[7]  <- "absence_because_visible"      # subjects who inferred the absence of the latent effect because it should have been visible
+colnames(explan_data)[8]  <- "absence_because_description"  # subjects who inferred the absence of the latent effect for any other reason 
+colnames(explan_data)[9]  <- "inferred_absence"             # overall number of subjects who inferred the absence of the latent feature 
+
+
+# "nm" below means "not meet"; expressing the the criterion is not fulfilled
+
+explan_data$different_explanation[explan_data$different_explanation == 1] <- "different_explanation"
+explan_data$different_explanation[is.na(explan_data$different_explanation)] <- "nm"
+
+explan_data$different_explanation <- factor(explan_data$different_explanation, levels = c("nm", "different_explanation"), 
+                                     labels = c("nm", "different explanation"))
+
+explan_data$no_explanation[explan_data$no_explanation == 1] <- "no_explan"
+explan_data$no_explanation[is.na(explan_data$no_explanation)] <- "nm"
+
+explan_data$no_explanation <- factor(explan_data$no_explanation, levels = c("nm", "no_explan"), 
+                                     labels = c("nm", "no explanation or unclear"))
+
+explan_data$misunderstood_scenario[explan_data$misunderstood_scenario == 1] <- "misunderstood"
+explan_data$misunderstood_scenario[is.na(explan_data$misunderstood_scenario)] <- "nm"
+
+explan_data$misunderstood_scenario <- factor(explan_data$misunderstood_scenario, levels = c("nm", "misunderstood"), 
+                                     labels = c("nm", "misunderstood scenario"))
+
+
+explan_data$equally_likely[explan_data$equally_likely == 1] <- "equally_likely"
+explan_data$equally_likely[is.na(explan_data$equally_likely)] <- "nm"
+
+
+explan_data$equally_likely <- factor(explan_data$equally_likely, levels = c("nm", "equally_likely"), 
+                                     labels = c("nm", "equally likely"))
+
+
+
+explan_data$absence_because_visible[explan_data$absence_because_visible == 1] <- "yes"
+explan_data$absence_because_visible[is.na(explan_data$absence_because_visible)] <- "nm"
+
+
+explan_data$absence_because_visible <- factor(explan_data$absence_because_visible, levels = c("nm", "yes"), 
+                                     labels = c("nm", "absence because it should be visible"))
+
+
+
+explan_data$absence_because_description[explan_data$absence_because_description == 1] <- "yes"
+explan_data$absence_because_description[is.na(explan_data$absence_because_description)] <- "nm"
+
+
+explan_data$absence_because_description <- factor(explan_data$absence_because_description, levels = c("nm", "yes"), 
+                                     labels = c("nm", "absence given the description"))
+
+
+
+explan_data$inferred_absence[explan_data$inferred_absence == 1] <- "yes"
+explan_data$inferred_absence[is.na(explan_data$inferred_absence)] <- "nm"
+
+explan_data$inferred_absence <- factor(explan_data$inferred_absence, levels = c("nm", "yes"),
+                                       labels = c("nm", "inferred absence"))
+
+
+```
+
+
+## subjects giving no explanation or unclear explanation 
+
+```{r}
+# create a summary dataset that also contains the percentages
+
+plotdata_between <- explan_data %>%
+  group_by(Features, no_explanation) %>%
+  summarize(n = n()) %>% 
+  mutate(pct = n/sum(n),
+         lbl = scales::percent(pct))
+
+
+plotdata_between
+
+plotdata_sub <- subset(plotdata_between, no_explanation == "no explanation or unclear")
+
+
+```
+
+
+
+```{r}
+
+plotdata <- plotdata_between
+
+
+
+g<- ggplot(plotdata, 
+       aes(x = Features,
+           y = pct,
+           fill = no_explanation)) +
+  #facet_grid( ~ Features)+
+  geom_bar(stat = "identity",
+           position = "fill") +
+  scale_y_continuous(limits = seq(0, 2),
+                     breaks = seq(0, 1, .25),
+                     expand = c(0,0),
+                     label = percent) +
+  #scale_x_discrete(labels = c("not \nmentioned", "'you don't \nknow'"))+
+  coord_cartesian(xlim =c(1, 2), ylim = c(0, 1.1))+
+  #coord_cartesian(clip = "off")+
+  geom_text(aes(label = lbl), 
+            size = 4.5,
+            position = position_stack(vjust = 0.5)) +
+  scale_fill_brewer(palette = "Pastel1") +
+  labs(y = "Percentage", 
+       fill = "Inferred state",
+       x = "Features",
+       title = "Subjects' inference about latent feature (overall)")+
+  #annotate(geom = "hline",yintercept = 0.5, y = 0.5, color = "black", size = 1, linetype='dotted')+
+  #annotate("pointrange", x = plotdata_sub$Transformation, y = 1 - plotdata_sub$pct, 
+   #        ymin = 1 - plotdata_sub$pct - plotdata_sub$CI, 
+    #       ymax = 1- plotdata_sub$pct + plotdata_sub$CI, 
+     #      colour = "black", size = 0.8, shape = 22, fill = "lightblue", fatten = 1)+
+  #annotate("text", x = pvalues_x, y = Inf, label = pvalues, size = 4, vjust = 1.8)+
+  theme(legend.position = "top", axis.title = element_text(size = 15), axis.text = element_text(size = 13, color = "black"),
+        legend.text = element_text(size = 13),legend.title = element_text(size = 13))+
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+
+g
+
+#ggsave("selections.pdf",width=6,height=5)
+#ggsave("absence_overall.svg",width=6,height=5)
+```
+
+```{r}
+prop.test(x = c(plotdata$n[2], plotdata$n[4]), n = c(40, 40), alternative = "two.sided", correct = F)
+```
+
+## Subjects clearly stating they'd prefer to answer 50:50
+
+
+```{r}
+# create a summary dataset that also contains the percentages
+
+plotdata_between <- explan_data %>%
+  group_by(Features, equally_likely) %>%
+  summarize(n = n()) %>% 
+  mutate(pct = n/sum(n),
+         lbl = scales::percent(pct))
+
+
+
+plotdata_between
+
+plotdata_sub <- subset(plotdata_between, equally_likely == "equally likely")
+
+
+```
+
+
+```{r}
+
+plotdata <- plotdata_between
+
+
+
+g<- ggplot(plotdata, 
+       aes(x = Features,
+           y = pct,
+           fill = equally_likely)) +
+  #facet_grid( ~ Features)+
+  geom_bar(stat = "identity",
+           position = "fill") +
+  scale_y_continuous(limits = seq(0, 2),
+                     breaks = seq(0, 1, .25),
+                     expand = c(0,0),
+                     label = percent) +
+  coord_cartesian(xlim =c(1, 2), ylim = c(0, 1.1))+
+  #scale_x_discrete(labels = c("not \nmentioned", "'you don't \nknow'"))+
+  #coord_cartesian(clip = "off")+
+  geom_text(aes(label = lbl), 
+            size = 4.5,
+            position = position_stack(vjust = 0.5)) +
+  scale_fill_brewer(palette = "Pastel1", labels = c("nm", "'equally likely option'")) +
+  labs(y = "Percentage", 
+       fill = "Categorization of \nsubjects' explanations",
+       x = "Features")+
+  #annotate(geom = "hline",yintercept = 0.5, y = 0.5, color = "black", size = 1, linetype='dotted')+
+  #annotate("pointrange", x = plotdata_sub$Transformation, y = 1 - plotdata_sub$pct, 
+   #        ymin = 1 - plotdata_sub$pct - plotdata_sub$CI, 
+    #       ymax = 1- plotdata_sub$pct + plotdata_sub$CI, 
+     #      colour = "black", size = 0.8, shape = 22, fill = "lightblue", fatten = 1)+
+  #annotate("text", x = pvalues_x, y = Inf, label = pvalues, size = 4, vjust = 1.8)+
+  theme(legend.position = "top", axis.title = element_text(size = 15), axis.text = element_text(size = 13, color = "black"),
+        legend.text = element_text(size = 13),legend.title = element_text(size = 13))+
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+
+g
+
+#ggsave("selections.pdf",width=6,height=5)
+#ggsave("preferred_answer.svg",width=6,height=5)
+```
+
+```{r}
+prop.test(x = c(plotdata$n[2], plotdata$n[4]), n = c(40, 40), alternative = "greater", correct = F)
+```
+
+
+## Subjects who inferred the absence of the latent feature
+
+Because of its visibility: 
+
+```{r}
+# create a summary dataset that also contains the percentages
+
+plotdata_between <- explan_data %>%
+  group_by(Features, Knowledge, absence_because_visible) %>%
+  summarize(n = n()) %>% 
+  mutate(pct = n/sum(n),
+         lbl = scales::percent(pct))
+
+
+
+plotdata_between
+
+plotdata_sub <- subset(plotdata_between, absence_because_visible == "absence because it should be visible")
+
+
+```
+
+
+
+```{r}
+
+plotdata <- plotdata_between
+
+
+
+g<- ggplot(plotdata, 
+       aes(x = Features,
+           y = pct,
+           fill = absence_because_visible)) +
+  #facet_grid( ~ Features)+
+  geom_bar(stat = "identity",
+           position = "fill") +
+  scale_y_continuous(limits = seq(0, 2),
+                     breaks = seq(0, 1, .25),
+                     expand = c(0,0),
+                     label = percent) +
+  #scale_x_discrete(labels = c("not \nmentioned", "'you don't \nknow'"))+
+  coord_cartesian(xlim =c(1, 2), ylim = c(0, 1.1))+
+  #coord_cartesian(clip = "off")+
+  geom_text(aes(label = lbl), 
+            size = 4.5,
+            position = position_stack(vjust = 0.5)) +
+  scale_fill_brewer(palette = "Pastel1") +
+  labs(y = "Percentage", 
+       fill = "Inferred state",
+       x = "Features",
+       title = "Subjects' inference about latent feature")+
+  #annotate(geom = "hline",yintercept = 0.5, y = 0.5, color = "black", size = 1, linetype='dotted')+
+  #annotate("pointrange", x = plotdata_sub$Transformation, y = 1 - plotdata_sub$pct, 
+   #        ymin = 1 - plotdata_sub$pct - plotdata_sub$CI, 
+    #       ymax = 1- plotdata_sub$pct + plotdata_sub$CI, 
+     #      colour = "black", size = 0.8, shape = 22, fill = "lightblue", fatten = 1)+
+  #annotate("text", x = pvalues_x, y = Inf, label = pvalues, size = 4, vjust = 1.8)+
+  theme(legend.position = "top", axis.title = element_text(size = 15), axis.text = element_text(size = 13, color = "black"),
+        legend.text = element_text(size = 13),legend.title = element_text(size = 13))+
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+
+g
+
+#ggsave("selections.pdf",width=6,height=5)
+#ggsave("absence_because_visible.svg",width=6,height=5)
+```
+
+
+```{r}
+prop.test(x = c(plotdata$n[2], plotdata$n[4]), n = c(40, 40), alternative = "less", correct = F)
+```
+
+
+Inferred absence for any other reason: 
+
+```{r}
+# create a summary dataset that also contains the percentages
+
+plotdata_between <- explan_data %>%
+  group_by(Features, absence_because_description) %>%
+  summarize(n = n()) %>% 
+  mutate(pct = n/sum(n),
+         lbl = scales::percent(pct))
+
+
+
+plotdata_between
+
+plotdata_sub <- subset(plotdata_between, absence_because_description == "absence given the description")
+
+
+```
+
+
+```{r}
+
+plotdata <- plotdata_between
+
+
+
+g<- ggplot(plotdata, 
+       aes(x = Features,
+           y = pct,
+           fill = absence_because_description)) +
+  #facet_grid( ~ Features)+
+  geom_bar(stat = "identity",
+           position = "fill") +
+  scale_y_continuous(limits = seq(0, 2),
+                     breaks = seq(0, 1, .25),
+                     expand = c(0,0),
+                     label = percent) +
+  #scale_x_discrete(labels = c("not \nmentioned", "'you don't \nknow'"))+
+  coord_cartesian(xlim =c(1, 2), ylim = c(0, 1.1))+
+  #coord_cartesian(clip = "off")+
+  geom_text(aes(label = lbl), 
+            size = 4.5,
+            position = position_stack(vjust = 0.5)) +
+  scale_fill_brewer(palette = "Pastel1") +
+  labs(y = "Percentage", 
+       fill = "Inferred state",
+       x = "Features",
+       title = "Subjects' inference about latent feature 2")+
+  #annotate(geom = "hline",yintercept = 0.5, y = 0.5, color = "black", size = 1, linetype='dotted')+
+  #annotate("pointrange", x = plotdata_sub$Transformation, y = 1 - plotdata_sub$pct, 
+   #        ymin = 1 - plotdata_sub$pct - plotdata_sub$CI, 
+    #       ymax = 1- plotdata_sub$pct + plotdata_sub$CI, 
+     #      colour = "black", size = 0.8, shape = 22, fill = "lightblue", fatten = 1)+
+  #annotate("text", x = pvalues_x, y = Inf, label = pvalues, size = 4, vjust = 1.8)+
+  theme(legend.position = "top", axis.title = element_text(size = 15), axis.text = element_text(size = 13, color = "black"),
+        legend.text = element_text(size = 13),legend.title = element_text(size = 13))+
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+
+g
+
+#ggsave("selections.pdf",width=6,height=5)
+#ggsave("absence_because_description.svg",width=6,height=5)
+```
+
+```{r}
+prop.test(x = c(0, plotdata$n[3]), n = c(40, 40), alternative = "less", correct = F)
+```
+
+
+Inferred Absence of latent feature overall: 
+
+```{r}
+# create a summary dataset that also contains the percentages
+
+plotdata_between <- explan_data %>%
+  group_by(Features, inferred_absence) %>%
+  summarize(n = n()) %>% 
+  mutate(pct = n/sum(n),
+         lbl = scales::percent(pct))
+
+
+
+plotdata_between
+
+plotdata_sub <- subset(plotdata_between, inferred_absence == "inferred absence")
+
+
+```
+
+
+```{r}
+
+plotdata <- plotdata_between
+
+
+
+g<- ggplot(plotdata, 
+       aes(x = Features,
+           y = pct,
+           fill = inferred_absence)) +
+  #facet_grid( ~ Features)+
+  geom_bar(stat = "identity",
+           position = "fill") +
+  scale_y_continuous(limits = seq(0, 2),
+                     breaks = seq(0, 1, .25),
+                     expand = c(0,0),
+                     label = percent) +
+  #scale_x_discrete(labels = c("not \nmentioned", "'you don't \nknow'"))+
+  coord_cartesian(xlim =c(1, 2), ylim = c(0, 1.1))+
+  #coord_cartesian(clip = "off")+
+  geom_text(aes(label = lbl), 
+            size = 4.5,
+            position = position_stack(vjust = 0.5)) +
+  scale_fill_brewer(palette = "Pastel1") +
+  labs(y = "Percentage", 
+       fill = "Inferred state",
+       x = "Features",
+       title = "Subjects' inference about latent feature (overall)")+
+  #annotate(geom = "hline",yintercept = 0.5, y = 0.5, color = "black", size = 1, linetype='dotted')+
+  #annotate("pointrange", x = plotdata_sub$Transformation, y = 1 - plotdata_sub$pct, 
+   #        ymin = 1 - plotdata_sub$pct - plotdata_sub$CI, 
+    #       ymax = 1- plotdata_sub$pct + plotdata_sub$CI, 
+     #      colour = "black", size = 0.8, shape = 22, fill = "lightblue", fatten = 1)+
+  #annotate("text", x = pvalues_x, y = Inf, label = pvalues, size = 4, vjust = 1.8)+
+  theme(legend.position = "top", axis.title = element_text(size = 15), axis.text = element_text(size = 13, color = "black"),
+        legend.text = element_text(size = 13),legend.title = element_text(size = 13))+
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+
+g
+
+#ggsave("selections.pdf",width=6,height=5)
+#ggsave("absence_overall.svg",width=6,height=5)
+```
+
+
+```{r}
+prop.test(x = c(plotdata$n[2], plotdata$n[4]), n = c(40, 40), alternative = "less", correct = F)
+```
+
+
+## Subjects giving a different kind of explanation (i.e., explanations that have nothing to do with visibility)
+
+```{r}
+# create a summary dataset that also contains the percentages
+
+plotdata_between <- explan_data %>%
+  group_by(Features, different_explanation) %>%
+  summarize(n = n()) %>% 
+  mutate(pct = n/sum(n),
+         lbl = scales::percent(pct))
+
+
+plotdata_between
+
+plotdata_sub <- subset(plotdata_between, different_explanation == "different_explanation")
+```
+
+
+
+```{r}
+
+plotdata <- plotdata_between
+
+
+
+g<- ggplot(plotdata, 
+       aes(x = Features,
+           y = pct,
+           fill = different_explanation)) +
+  #facet_grid( ~ Features)+
+  geom_bar(stat = "identity",
+           position = "fill") +
+  scale_y_continuous(limits = seq(0, 2),
+                     breaks = seq(0, 1, .25),
+                     expand = c(0,0),
+                     label = percent) +
+  #scale_x_discrete(labels = c("not \nmentioned", "'you don't \nknow'"))+
+  coord_cartesian(xlim =c(1, 2), ylim = c(0, 1.1))+
+  #coord_cartesian(clip = "off")+
+  geom_text(aes(label = lbl), 
+            size = 4.5,
+            position = position_stack(vjust = 0.5)) +
+  scale_fill_brewer(palette = "Pastel1") +
+  labs(y = "Percentage", 
+       fill = "Inferred state",
+       x = "Features",
+       title = "Subjects' inference about latent feature (overall)")+
+  #annotate(geom = "hline",yintercept = 0.5, y = 0.5, color = "black", size = 1, linetype='dotted')+
+  #annotate("pointrange", x = plotdata_sub$Transformation, y = 1 - plotdata_sub$pct, 
+   #        ymin = 1 - plotdata_sub$pct - plotdata_sub$CI, 
+    #       ymax = 1- plotdata_sub$pct + plotdata_sub$CI, 
+     #      colour = "black", size = 0.8, shape = 22, fill = "lightblue", fatten = 1)+
+  #annotate("text", x = pvalues_x, y = Inf, label = pvalues, size = 4, vjust = 1.8)+
+  theme(legend.position = "top", axis.title = element_text(size = 15), axis.text = element_text(size = 13, color = "black"),
+        legend.text = element_text(size = 13),legend.title = element_text(size = 13))+
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+
+g
+
+#ggsave("selections.pdf",width=6,height=5)
+#ggsave("absence_overall.svg",width=6,height=5)
+```
+
+
+```{r}
+prop.test(x = c(plotdata$n[2], plotdata$n[4]), n = c(40, 40), alternative = "two.sided", correct = F)
+```

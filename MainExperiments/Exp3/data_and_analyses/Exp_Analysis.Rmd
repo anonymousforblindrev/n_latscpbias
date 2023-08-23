@@ -38,6 +38,16 @@ tdata <- read_csv("exp_data.csv")
 ```
 
 
+
+```{r}
+# remove subject with duplicate entry
+tdata <- tdata %>% distinct(subj_code, .keep_all = TRUE)
+
+# Note that two rows appear twice, and the duplicates must be deleted
+```
+
+
+
 # Subject demographics
 
 ```{r}
@@ -152,8 +162,8 @@ g <- ggplot(tdata_sub, aes(x = 0.5, y = valueJitter)) +
 g
 
 
-#ggsave("results_means_mainDV.svg",width=5,height=5)
-#ggsave("results_means_mainDV.pdf",width=5,height=5)
+ggsave("results_means_mainDV.svg",width=5,height=5)
+ggsave("results_means_mainDV.pdf",width=5,height=5)
 ```
 
 
@@ -253,7 +263,7 @@ theme_set(theme_light(base_size = 12, base_family = "Poppins"))
 g<- ggplot(plotdata, 
        aes(x = category,
            y = pct,
-           fill = category)) +
+           fill = "#66c2a5")) +
   geom_bar(stat = "identity",
            position = "dodge") +
   scale_y_continuous(limits = seq(0, 2),
@@ -284,9 +294,9 @@ g<- ggplot(plotdata,
 
 g
 
-#ggsave("selections_between.pdf",width=6,height=5)
-#ggsave("categories.svg",width=5,height=5)
-#ggsave("categories.pdf",width=5,height=5)
+
+ggsave("categories.svg",width=5,height=5)
+ggsave("categories.pdf",width=5,height=5)
 ```
 
 # Remaining results (additional test cases)
@@ -406,9 +416,9 @@ g<- ggplot(plotdata,
 
 g
 
-#ggsave("selections_between.pdf",width=6,height=5)
-#ggsave("categories_bluefeet.svg",width=7,height=4)
-#ggsave("categories_bluefeet.pdf",width=7,height=4)
+
+ggsave("categories_bluefeet.svg",width=7,height=4)
+ggsave("categories_bluefeet.pdf",width=7,height=4)
 ```
 
 
@@ -533,9 +543,8 @@ g<- ggplot(plotdata,
 
 g
 
-#ggsave("selections_between.pdf",width=6,height=5)
-#ggsave("categories_bluebeak.svg",width=7,height=4)
-#ggsave("categories_bluebeak.pdf",width=7,height=4)
+ggsave("categories_bluebeak.svg",width=7,height=4)
+ggsave("categories_bluebeak.pdf",width=7,height=4)
 ```
 
 
@@ -664,9 +673,9 @@ g<- ggplot(plotdata,
 
 g
 
-#ggsave("selections_between.pdf",width=6,height=5)
-#ggsave("categories_typical.svg",width=7,height=4)
-#ggsave("categories_typical.pdf",width=7,height=4)
+
+ggsave("categories_typical.svg",width=7,height=4)
+ggsave("categories_typical.pdf",width=7,height=4)
 ```
 
 
@@ -776,9 +785,8 @@ g<- ggplot(plotdata,
 
 g
 
-#ggsave("selections_between.pdf",width=6,height=5)
-#ggsave("categories_both.svg",width=7,height=4)
-#ggsave("categories_both.pdf",width=7,height=4)
+ggsave("categories_both.svg",width=7,height=4)
+ggsave("categories_both.pdf",width=7,height=4)
 ```
 
 
