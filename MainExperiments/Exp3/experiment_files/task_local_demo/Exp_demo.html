@@ -61,7 +61,6 @@ var preload = {
   type: jsPsychPreload,
   images: ['img/uni_org_color_li.png', 
            'img/mutations_illu.png', 
-           'img/rates_illu.png', 
            'img/probe_amb_beak.png',
            'img/probe_amb_feet.png', 
            'img/probe_cert_beak.png', 
@@ -105,14 +104,25 @@ var select = {
     {
 		prompt: 
 		`
-		<p><b>This study is in DEMO mode. <br> Select a condition: type in a number between 1 and 4.</b></p>
+		<p><b>This study is in DEMO mode. <br> Select a condition: type in a number between 1 and 8.</b></p>
     <p>
-      1 and 2 have latent feature "beak"; 3 and 4 "feet"<br>
+      Conditions 1 to 4 present explicit prevalence information.
+    </p>
+    <p>
+      1 and 2 have unobserved feature "feet"; 3 and 4 "beak"<br>
       1 and 3 have narrow cause on the left side of rating scale<br>
       2 and 4 have narrow cause on the right side of the rating scale
     </p>
+    <p>
+      Condition 5 to 8 don't present prevalence information.
+    </p>
+    <p>
+      5 and 6 have unobserved feature "feet"; 7 and 8 "beak"<br>
+      5 and 7 have narrow cause on the left side of rating scale<br>
+      6 and 8 have narrow cause on the right side of the rating scale
+    </p>
 		`, 
-		placeholder: 'number between 1 and 4',
+		placeholder: 'number between 1 and 8',
 		required: true,
 		name: 'CondSel',
 	},
@@ -156,9 +166,9 @@ scenario_intro = `
 <p>Three mutations explain the observed color deviations:</p>
 
 <p>
-    - A mutation called <b>BkFt2</b>, leading to a <b>blue beak</b> and <b>blue feet</b>.<br>
-    - A mutation called <b>Bk1</b>, leading only to a <b>blue beak</b>.<br>
-    - And a mutation called <b>Ft1</b>, leading only to <b>blue feet</b>.<br>
+    - A mutation of a gene called <b>PIX67</b>, leading to a <b>blue beak</b> and <b>blue feet</b>.<br>
+    - A mutation of a gene called <b>TOX20</b>, leading only to a <b>blue beak</b>.<br>
+    - And a mutation of a gene called <b>NAX20</b>, leading only to <b>blue feet</b>.<br>
 </p>
 
 <hr>
@@ -172,20 +182,49 @@ scenario_intro = `
 `;
 
 
-scenario_intro_2 = `
+scenario_intro_2_beak_unobserved = `
 <p><i>Please read this additional information about the prevalence of the mutations:</i></p>
 
 <p>
     The biologists managed to collect DNA samples from all the ducks of Lake Caldazzo.
-    A laboratory analysis of these samples revealed that all three mutations occur equally often in the population. Each mutation occurs with a probability of 5%. 
-    That means each duck has a 5% chance of having the BkFt2 mutation, a 5% chance of having the Bk1 mutation, and a 5% chance of having the Ft1 mutation. 
-    Also, the mutations occur independently of each other, which means that having one of the mutations has no influence on the probability of having another mutation. 
-    It is therefore also possible for a duck to end up with more than one mutation. 
+    A laboratory analysis of these samples revealed that all three mutations occur equally often in the population. That means each duck has 
+    the same chance of having the PIX67 mutation (causing both blue beak and blue feet), the TOX20 mutation (causing only a blue beak), or the NAX20 mutation (causing only blue feet). 
+    Also, the mutations occur independently of each other, which means that having one of the mutations has no influence on the probability of having another mutation.
+    The analyses the biologists conducted also showed that 5% of the ducks in the population have a blue beak.   
 </p>
 
 <p><i>Please click "Continue" to proceed.</i></p>
 `;
 
+scenario_intro_2_feet_unobserved = `
+<p><i>Please read this additional information about the prevalence of the mutations:</i></p>
+
+<p>
+    The biologists managed to collect DNA samples from all the ducks of Lake Caldazzo.
+    A laboratory analysis of these samples revealed that all three mutations occur equally often in the population. That means each duck has 
+    the same chance of having the PIX67 mutation (causing both blue beak and blue feet), the TOX20 mutation (causing only a blue beak), or the NAX20 mutation (causing only blue feet). 
+    Also, the mutations occur independently of each other, which means that having one of the mutations has no influence on the probability of having another mutation.
+    The analyses the biologists conducted also showed that 5% of the ducks in the population have blue feet.   
+</p>
+
+<p><i>Please click "Continue" to proceed.</i></p>
+`;
+
+
+
+
+scenario_intro_2_no_rates = `
+<p><i>Please read this additional information about the prevalence of the mutations:</i></p>
+
+<p>
+    The biologists managed to collect DNA samples from all the ducks of Lake Caldazzo.
+    A laboratory analysis of these samples revealed that all three mutations occur equally often in the population. That means each duck has 
+    the same chance of having the PIX67 mutation (causing both blue beak and blue feet), the TOX20 mutation (causing only a blue beak), or the NAX20 mutation (causing only blue feet). 
+    Also, the mutations occur independently of each other, which means that having one of the mutations has no influence on the probability of having another mutation. 
+</p>
+
+<p><i>Please click "Continue" to proceed.</i></p>
+`;
 
 
 //////////////////////////////////////////////////////
@@ -207,28 +246,65 @@ var confs = {
     }, 
   ],
   on_finish: function(data){
-    if (condition == 1) {
+    if (condition == 1) { // condition 1 to 4: with rate information
         scale_orientation = "narrow_left";
-        likert_scale = ["Definitely a Bk1 mutation (blue beak only)", " ", " ", " ", " ", "Both equally likely", " ", " ", " ", " ", "Definitely a BkFt2 mutation (blue beak and feet)"];
-        latent_feature = "beak";
+        likert_scale = ["Definitely a TOX20 mutation (blue beak only)", " ", " ", " ", " ", "Both equally likely", " ", " ", " ", " ", "Definitely a PIX67 mutation (blue beak and feet)"];
+        latent_feature = "feet";
         probe = "probe_amb_beak.png";
+        rates = "presented";
+        scenario_intro_2 = scenario_intro_2_feet_unobserved;
       } else if (condition == 2) {
         scale_orientation = "narrow_right";
-        likert_scale = ["Definitely a BkFt2 mutation (blue beak and feet)", " ", " ", " ", " ", "Both equally likely", " ", " ", " ", " ", "Definitely a Bk1 mutation (blue beak only)"];
-        latent_feature = "beak";
+        likert_scale = ["Definitely a PIX67 mutation (blue beak and feet)", " ", " ", " ", " ", "Both equally likely", " ", " ", " ", " ", "Definitely a TOX20 mutation (blue beak only)"];
+        latent_feature = "feet";
         probe = "probe_amb_beak.png";
+        rates = "presented";
+        scenario_intro_2 = scenario_intro_2_feet_unobserved;
       } else if (condition == 3) {
         scale_orientation = "narrow_left";
-        likert_scale = ["Definitely a Ft1 mutation (blue feet only)", " ", " ", " ", " ", "Both equally likely", " ", " ", " ", " ", "Definitely a BkFt2 mutation (blue beak and feet)"];
-        latent_feature = "feet";
+        likert_scale = ["Definitely a NAX20 mutation (blue feet only)", " ", " ", " ", " ", "Both equally likely", " ", " ", " ", " ", "Definitely a PIX67 mutation (blue feet and beak)"];
+        latent_feature = "beak";
         probe = "probe_amb_feet.png";
+        rates = "presented";
+        scenario_intro_2 = scenario_intro_2_beak_unobserved;
       } else if (condition == 4) {
         scale_orientation = "narrow_right";
-        likert_scale = ["Definitely a BkFt2 mutation (blue beak and feet)", " ", " ", " ", " ", "Both equally likely", " ", " ", " ", " ", "Definitely a Ft1 mutation (blue feet only)"];
-        latent_feature = "feet";
+        likert_scale = ["Definitely a PIX67 mutation (blue feet and beak)", " ", " ", " ", " ", "Both equally likely", " ", " ", " ", " ", "Definitely a NAX20 mutation (blue feet only)"];
+        latent_feature = "beak";
         probe = "probe_amb_feet.png";
+        rates = "presented";
+        scenario_intro_2 = scenario_intro_2_beak_unobserved;
+      } else if (condition == 5) {// conditions 5 to 8: no rate information
+        scale_orientation = "narrow_left";
+        likert_scale = ["Definitely a TOX20 mutation (blue beak only)", " ", " ", " ", " ", "Both equally likely", " ", " ", " ", " ", "Definitely a PIX67 mutation (blue beak and feet)"];
+        latent_feature = "feet";
+        probe = "probe_amb_beak.png";
+        rates = "omitted";
+        scenario_intro_2 = scenario_intro_2_feet_unobserved;
+      } else if (condition == 6) {
+        scale_orientation = "narrow_right";
+        likert_scale = ["Definitely a PIX67 mutation (blue beak and feet)", " ", " ", " ", " ", "Both equally likely", " ", " ", " ", " ", "Definitely a TOX20 mutation (blue beak only)"];
+        latent_feature = "feet";
+        probe = "probe_amb_beak.png";
+        rates = "omitted";
+        scenario_intro_2 = scenario_intro_2_feet_unobserved;
+      } else if (condition == 7) {
+        scale_orientation = "narrow_left";
+        likert_scale = ["Definitely a NAX20 mutation (blue feet only)", " ", " ", " ", " ", "Both equally likely", " ", " ", " ", " ", "Definitely a PIX67 mutation (blue feet and beak)"];
+        latent_feature = "beak";
+        probe = "probe_amb_feet.png";
+        rates = "omitted";
+        scenario_intro_2 = scenario_intro_2_beak_unobserved;
+      } else if (condition == 8) {
+        scale_orientation = "narrow_right";
+        likert_scale = ["Definitely a PIX67 mutation (blue feet and beak)", " ", " ", " ", " ", "Both equally likely", " ", " ", " ", " ", "Definitely a NAX20 mutation (blue feet only)"];
+        latent_feature = "beak";
+        probe = "probe_amb_feet.png";
+        rates = "omitted";
+        scenario_intro_2 = scenario_intro_2_beak_unobserved;
       };
-	  jsPsych.data.addProperties({desktop_conf: data.response.DesktopConf, attent_conf: data.response.AttentConf, scale_orient: scale_orientation, latent_feature: latent_feature});
+	  jsPsych.data.addProperties({desktop_conf: data.response.DesktopConf, attent_conf: data.response.AttentConf, prevalence: rates, scale_orient: scale_orientation, latent_feature: latent_feature});
+    console.log(rates);
   },
   preamble: `
               <p><img src="img/uni_org_color_li.png" width = 100%></img></p>
@@ -253,7 +329,10 @@ var intro_1 = {
     choices: ['Continue']
 }
 
-var intro_2 = {
+timeline.push(intro_1);
+
+
+var intro_2 = {// what subjects see as intro 2 depends on "rate presentation" condition
   type: jsPsychHtmlButtonResponse,
   stimulus: 
   function() {return `
@@ -263,21 +342,58 @@ var intro_2 = {
     choices: ['Continue']
 }
 
-timeline.push(intro_1, intro_2);
+var intro_2_no_rates = {// what subjects see as intro 2 depends on "rate presentation" condition
+  type: jsPsychHtmlButtonResponse,
+  stimulus: 
+  function() {return `
+        `+scenario_intro_2_no_rates+`
+  `
+  },
+    choices: ['Continue']
+}
+
+
+
+
+var intro_with_rates = {
+  timeline: [intro_2],
+  conditional_function: function () {
+    if (condition <= 4) {
+      return true; 
+    } else {
+      return false;
+    }
+  }
+}
+
+timeline.push(intro_with_rates);
+
+var intro_without_rates = {
+  timeline: [intro_2_no_rates],
+  conditional_function: function () {
+    if (condition >= 5) {
+      return true; 
+    } else {
+      return false;
+    }
+  }
+}
+
+timeline.push(intro_without_rates);
 
 
 //////////////////
 /* instr */ 
-var instr_check_1 = {
+var instr_check_unobserved_feet = {
   type: jsPsychSurveyMultiChoice,
   name: 'instr_check',
   questions: [
     {
       prompt: "<b>What is correct about the effects of the three mutations?</b>", 
-      options: ['1: All mutations (BkFt2, Bk1, Ft1) only cause one effect (either a blue beak or blue feet).', 
-                '2: BkFt2 causes a blue beak and blue feet, Bk1 only a blue beak, and Ft1 only blue feet.',
-                '3: All mutations (BkFt2, Bk1, Ft1) only cause a blue beak', 
-                '4: All mutations (BkFt2, Bk1, Ft1) only cause blue feet.'],
+      options: ['1: All mutations (PIX67, TOX20, NAX20) only cause one effect (either a blue beak or blue feet).', 
+                '2: PIX67 causes a blue beak and blue feet, TOX20 only a blue beak, and NAX20 only blue feet.',
+                '3: All mutations (PIX67, TOX20, NAX20) only cause a blue beak', 
+                '4: All mutations (PIX67, TOX20, NAX20) only cause blue feet.'],
       required: true,
       name: 'scope_check'
     },
@@ -291,15 +407,21 @@ var instr_check_1 = {
     },
     {
       prompt: "<b>What is true about the frequency with which the three different mutations occur in the duck population?</b>", 
-      options: ['1: All three mutations occur equally often (5%).', 
-                '2: All three mutations occur equally often (95%).', 
-                '3: All three mutations occur with different probabilities (5%, 10%, and 85%).', 
-                '4: Two mutations occur with the same probability (5% and 5%), and a third occurs more often (20%).'],
+      options: ['1: All three mutations occur equally often.', 
+                '2: All three mutations occur with different probabilities.', 
+                '3: Two mutations occur with the same probability, and a third occurs more often.'],
       required: true,
       name: 'rate_check'
     },
+    {
+      prompt: `<b>What percentage of ducks were found to have blue feet?</b>`, 
+      options: ['1: 5%.', 
+                '2: 50%.', 
+                '3: 95%.'],
+      required: true,
+      name: 'feature_prevalence_check'
+    },
   ],
-
   preamble: `
       <p><i>
         You have learned the relevant information about the duck population of Lake Caldazzo. 
@@ -313,8 +435,10 @@ var instr_check_1 = {
   on_finish: function(data){
     i ++;
     console.log("instr test rounds: "+i);
-    if (data.response.scope_check == '2: BkFt2 causes a blue beak and blue feet, Bk1 only a blue beak, and Ft1 only blue feet.' &
-        data.response.rate_check == '1: All three mutations occur equally often (5%).') {
+    if (data.response.scope_check == '2: PIX67 causes a blue beak and blue feet, TOX20 only a blue beak, and NAX20 only blue feet.' &
+        data.response.independence_check == '3: That means that having one mutation has no influence on the chance of having another mutation.' &
+        data.response.rate_check == '1: All three mutations occur equally often.' &
+        data.response.feature_prevalence_check == '1: 5%.') {
         instr_check_1 = "correct";
     } else {
       instr_check_1 = "incorrect";
@@ -323,56 +447,170 @@ var instr_check_1 = {
 	  jsPsych.data.addProperties({instr_tests: i});
   },
 };
-timeline.push(instr_check_1);
 
 
-
-
-likert_scale2 = ["5", "10", "15", "20", "25", "30", "35", "40", "45", "50", "55", "60", "65", "70", "75", "80", "85", "90", "95", "100"];
-
-var instr_check_2 = {
-  type: jsPsychSurveyLikert,
+var instr_check_unobserved_beak = {
+  type: jsPsychSurveyMultiChoice,
+  name: 'instr_check',
   questions: [
-    {prompt: function() {return `
-        <b>Imagine a perfectly reliable test that always finds a BkFt2 mutation in a duck if that mutation is present.
-        If such a test were to be conducted in a fully representative group of 100 ducks, in how many of them would the test be expected to detect the presence of a BkFt2 mutation? </b>`}, 
-    name: 'rate_check_bkft2', 
-    labels: function () {return likert_scale2}
+    {
+      prompt: "<b>What is correct about the effects of the three mutations?</b>", 
+      options: ['1: All mutations (PIX67, TOX20, NAX20) only cause one effect (either a blue beak or blue feet).', 
+                '2: PIX67 causes a blue beak and blue feet, TOX20 only a blue beak, and NAX20 only blue feet.',
+                '3: All mutations (PIX67, TOX20, NAX20) only cause a blue beak', 
+                '4: All mutations (PIX67, TOX20, NAX20) only cause blue feet.'],
+      required: true,
+      name: 'scope_check'
     },
-    {prompt: function() {return `
-        <b>Imagine a perfectly reliable test that always finds a Bk1 mutation in a duck if that mutation is present.
-        If such a test were to be conducted in a fully representative group of 100 ducks, in how many of them would the test be expected to detect the presence of a Bk1 mutation? </b>`}, 
-    name: 'rate_check_bk1', 
-    labels: function () {return likert_scale2}
+    {
+      prompt: "<b>What does it mean that the mutations occur independently of each other?</b>", 
+      options: ['1: That means that having one mutation reduces the chances of having another mutation.', 
+                '2: That means that having one mutation increases the chances of having another mutation.',
+                '3: That means that having one mutation has no influence on the chance of having another mutation.'],
+      required: true,
+      name: 'independence_check'
     },
-    {prompt: function() {return `
-        <b>Imagine a perfectly reliable test that always finds a Ft1 mutation in a duck if that mutation is present.
-        If such a test were to be conducted in a fully representative group of 100 ducks, in how many of them would the test be expected to detect the presence of a Ft1 mutation? </b>`}, 
-    name: 'rate_check_ft1', 
-    labels: function () {return likert_scale2}
+    {
+      prompt: "<b>What is true about the frequency with which the three different mutations occur in the duck population?</b>", 
+      options: ['1: All three mutations occur equally often.', 
+                '2: All three mutations occur with different probabilities.', 
+                '3: Two mutations occur with the same probability, and a third occurs more often.'],
+      required: true,
+      name: 'rate_check'
+    },
+    {
+      prompt: `<b>What percentage of ducks were found to have a blue beak?</b>`, 
+      options: ['1: 5%.', 
+                '2: 50%.', 
+                '3: 95%.'],
+      required: true,
+      name: 'feature_prevalence_check'
     },
   ],
-  randomize_question_order: false,
-  preamble: function() {
-    return `                 
-        <p><i>Please answer these additional comprehension check questions probing your understanding of each mutation's prevalence.</i></p>
-    `
-  },
+  preamble: `
+      <p><i>
+        You have learned the relevant information about the duck population of Lake Caldazzo. 
+        Before you can proceed to the next part of the experiment, 
+        we need to ensure that you've understood the central aspects of the scenario. 
+        Please answer the following comprehension-check questions. 
+        You can only proceed once you've answered all check questions correctly. 
+        If you answer any of the questions incorrectly, we'll show you the scenario description again.
+      </i></p>
+    `,
   on_finish: function(data){
-    if (data.response.rate_check_bkft2 == 0 &
-        data.response.rate_check_bk1 == 0 & 
-        data.response.rate_check_ft1 == 0) {
-        instr_check_2 = "correct";
+    i ++;
+    console.log("instr test rounds: "+i);
+    if (data.response.scope_check == '2: PIX67 causes a blue beak and blue feet, TOX20 only a blue beak, and NAX20 only blue feet.' &
+        data.response.independence_check == '3: That means that having one mutation has no influence on the chance of having another mutation.' &
+        data.response.rate_check == '1: All three mutations occur equally often.' &
+        data.response.feature_prevalence_check == '1: 5%.') {
+        instr_check_1 = "correct";
     } else {
-      instr_check_2 = "incorrect";
+      instr_check_1 = "incorrect";
     };
-    console.log("choice bkft2: "+data.response.rate_check_bkft2);
-    console.log("result instruction check: "+instr_check_2);
+    console.log("result instruction check: "+instr_check_1);
+	  jsPsych.data.addProperties({instr_tests: i});
   },
 };
 
-timeline.push(instr_check_2);
 
+
+var instr_check_no_feature_rates = {
+  type: jsPsychSurveyMultiChoice,
+  name: 'instr_check',
+  questions: [
+    {
+      prompt: "<b>What is correct about the effects of the three mutations?</b>", 
+      options: ['1: All mutations (PIX67, TOX20, NAX20) only cause one effect (either a blue beak or blue feet).', 
+                '2: PIX67 causes a blue beak and blue feet, TOX20 only a blue beak, and NAX20 only blue feet.',
+                '3: All mutations (PIX67, TOX20, NAX20) only cause a blue beak', 
+                '4: All mutations (PIX67, TOX20, NAX20) only cause blue feet.'],
+      required: true,
+      name: 'scope_check'
+    },
+    {
+      prompt: "<b>What does it mean that the mutations occur independently of each other?</b>", 
+      options: ['1: That means that having one mutation reduces the chances of having another mutation.', 
+                '2: That means that having one mutation increases the chances of having another mutation.',
+                '3: That means that having one mutation has no influence on the chance of having another mutation.'],
+      required: true,
+      name: 'independence_check'
+    },
+    {
+      prompt: "<b>What is true about the frequency with which the three different mutations occur in the duck population?</b>", 
+      options: ['1: All three mutations occur equally often.', 
+                '2: All three mutations occur with different probabilities.', 
+                '4: Two mutations occur with the same probability, and a third occurs more often.'],
+      required: true,
+      name: 'rate_check'
+    },
+  ],
+  preamble: `
+      <p><i>
+        You have learned the relevant information about the duck population of Lake Caldazzo. 
+        Before you can proceed to the next part of the experiment, 
+        we need to ensure that you've understood the central aspects of the scenario. 
+        Please answer the following comprehension-check questions. 
+        You can only proceed once you've answered all check questions correctly. 
+        If you answer any of the questions incorrectly, we'll show you the scenario description again.
+      </i></p>
+    `,
+  on_finish: function(data){
+    i ++;
+    console.log("instr test rounds: "+i);
+    if (data.response.scope_check == '2: PIX67 causes a blue beak and blue feet, TOX20 only a blue beak, and NAX20 only blue feet.' &
+        data.response.independence_check == '3: That means that having one mutation has no influence on the chance of having another mutation.' &
+        data.response.rate_check == '1: All three mutations occur equally often.') {
+        instr_check_1 = "correct";
+    } else {
+      instr_check_1 = "incorrect";
+    };
+    console.log("result instruction check: "+instr_check_1);
+	  jsPsych.data.addProperties({instr_tests: i});
+  },
+};
+
+
+
+
+var check_with_rates_unobserved_feet = {
+  timeline: [instr_check_unobserved_feet],
+  conditional_function: function () {
+    if (condition <= 2) {
+      return true; 
+    } else {
+      return false;
+    }
+  },
+};
+
+timeline.push(check_with_rates_unobserved_feet);
+
+var check_with_rates_unobserved_beak = {
+  timeline: [instr_check_unobserved_beak],
+  conditional_function: function () {
+    if (condition >= 3 && condition <= 4) {
+      return true; 
+    } else {
+      return false;
+    }
+  },
+};
+
+timeline.push(check_with_rates_unobserved_beak);
+
+var check_without_rates = {
+  timeline: [instr_check_no_feature_rates],
+  conditional_function: function () {
+    if (condition >= 5) {
+      return true; 
+    } else {
+      return false;
+    }
+  },
+};
+
+timeline.push(check_without_rates);
 
 
 // screen if instr check was failed 
@@ -389,10 +627,10 @@ var instr_check_failed = {
 }
 
 
-var loop_node = {
-    timeline: [instr_check_failed, intro_1, intro_2, instr_check_1, instr_check_2],
+var loop_node_with_rates_unobserved_feet = {
+    timeline: [instr_check_failed, intro_1, intro_2, instr_check_unobserved_feet],
     loop_function: function(data){
-        if(instr_check_1 == "incorrect" || instr_check_2 == "incorrect"){
+        if(instr_check_1 == "incorrect"){
             return true;
         } else {
             return false;
@@ -400,17 +638,104 @@ var loop_node = {
     }
 }
 
-var if_node = {
-    timeline: [loop_node],
+var if_node_with_rates_unobserved_feet = {
+    timeline: [loop_node_with_rates_unobserved_feet],
     conditional_function: function(){
-        if(instr_check_1 == "incorrect" || instr_check_2 == "incorrect" ){
+        if(instr_check_1 == "incorrect"){
             return true;
         } else {
             return false;
         }
     }
 }
-timeline.push(if_node); // note: the if_node evaluates the status of the instruction test variable and, given that it has value "incorrect", triggers the loop node
+
+
+var present_loop_with_rates_unobserved_feet = {
+  timeline: [if_node_with_rates_unobserved_feet],
+  conditional_function: function () {
+    if (condition <= 2) {
+      return true; 
+    } else {
+      return false;
+    }
+  }
+}
+
+
+timeline.push(present_loop_with_rates_unobserved_feet); // note: the if_node evaluates the status of the instruction test variable and, given that it has value "incorrect", triggers the loop node
+
+
+var loop_node_with_rates_unobserved_beak = {
+    timeline: [instr_check_failed, intro_1, intro_2, instr_check_unobserved_beak],
+    loop_function: function(data){
+        if(instr_check_1 == "incorrect"){
+            return true;
+        } else {
+            return false;
+        }
+    }
+}
+
+var if_node_with_rates_unobserved_beak = {
+    timeline: [loop_node_with_rates_unobserved_beak],
+    conditional_function: function(){
+        if(instr_check_1 == "incorrect"){
+            return true;
+        } else {
+            return false;
+        }
+    }
+}
+
+
+var present_loop_with_rates_unobserved_beak = {
+  timeline: [if_node_with_rates_unobserved_beak],
+  conditional_function: function () {
+    if (condition >= 3 && condition <= 4) {
+      return true; 
+    } else {
+      return false;
+    }
+  }
+}
+
+timeline.push(present_loop_with_rates_unobserved_beak); // note: the if_node evaluates the status of the instruction test variable and, given that it has value "incorrect", triggers the loop node
+
+
+var loop_node_without_rates = {
+    timeline: [instr_check_failed, intro_1, intro_2_no_rates, instr_check_no_feature_rates],
+    loop_function: function(data){
+        if(instr_check_1 == "incorrect"){
+            return true;
+        } else {
+            return false;
+        }
+    }
+}
+
+var if_node_without_rates = {
+    timeline: [loop_node_without_rates],
+    conditional_function: function(){
+        if(instr_check_1 == "incorrect"){
+            return true;
+        } else {
+            return false;
+        }
+    }
+}
+
+var present_loop_without_rates = {
+  timeline: [if_node_without_rates],
+  conditional_function: function () {
+    if (condition >= 5) {
+      return true; 
+    } else {
+      return false;
+    }
+  }
+}
+
+timeline.push(present_loop_without_rates); // note: the if_node evaluates the status of the instruction test variable and, given that it has value "incorrect", triggers the loop node
 
 
 // screen if instr check was passed
@@ -437,7 +762,7 @@ var intro_testphase = {
     <p><i>Please read this new information:</i></p>
     <p>
       On the following screens, we'll show you some photographs of ducks that were taken by a "wildlife photo trap", 
-      a camera the biologists' had installed at the lakeside that automatically took pictures of animals passing by. 
+      a camera the biologists had installed at the lakeside that automatically took pictures of animals passing by. 
       For each duck you'll see on these photographs, we'll ask you to indicate the most probable explanation for their appearance. 
       We'd like you to answer these questions based on what you've learned about the mutations in the duck population of lake Caldazzo.
     </p>
@@ -459,7 +784,9 @@ var LS_bias_probe = {
   questions: [
     {prompt: function() {return `<b>Based on what you've learned, what is the more probable explanation for this duck's appearance?</b>`}, 
     name: 'LS_bias_probe_rating', 
-    labels: function () {return likert_scale}},
+    required: true,
+    labels: function () {return likert_scale}
+    },
   ],
   randomize_question_order: false,
   preamble: function() {
@@ -501,12 +828,12 @@ timeline.push(explan);
 
 
 // establish randomized order of selection options
-var diag_options = ['This duck has a BkFt2 mutation (blue beak and blue feet).', 
-                    'This duck has a Bk1 mutation (blue beak).', 
-                    'This duck has a Ft1 mutation (blue feet).', 
-                    'This duck has BkFt2 mutation (blue beak and blue feet) and a Bk1 mutation (blue beak).', 
-                    'This duck has a BkFt2 mutation (blue beak and blue feet) and Ft1 mutation (blue feet).', 
-                    'This duck has a Bk1 mutation (blue beak only) and a Ft1 mutation (blue feet only).', 
+var diag_options = ['This duck has a PIX67 mutation (blue beak and blue feet).', 
+                    'This duck has a TOX20 mutation (blue beak).', 
+                    'This duck has a NAX20 mutation (blue feet).', 
+                    'This duck has PIX67 mutation (blue beak and blue feet) and a TOX20 mutation (blue beak).', 
+                    'This duck has a PIX67 mutation (blue beak and blue feet) and NAX20 mutation (blue feet).', 
+                    'This duck has a TOX20 mutation (blue beak) and a NAX20 mutation (blue feet).', 
                     'This duck has no mutation affecting beak and feet color.'];
 
 var diag_options_shuffled = jsPsych.randomization.repeat(diag_options, 1);
@@ -680,7 +1007,7 @@ var debriefing = {
   
     <p>The aim of this experiment is to find out more about how people form explanations. 
     If you are interested in further details or if you have any questions or comments concerning the experiment, 
-    feel free to contact me (ANONYMIZED RESEARCHER) under <i>ANONYMIZED E-MAIL</i>
+    feel free to contact me (ANONYMIZED RESEARCHER) under <i>ANONYMIZED E-MAIL</i>. 
     
     <p>To ensure you receive your reward, please click the button below to return to the Prolific website:</p>
     `
@@ -694,6 +1021,8 @@ timeline.push(debriefing);
 /////////////////////////////////////////////////////////////////
 /* start the experiment */
     jsPsych.run(timeline);
+    //jsPsych.simulate(timeline);
+
 
   
   </script>

@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Experiment 3 pilot</title>
+
+<script src="site_libs/header-attrs-2.18/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/readable.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/textmate.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+<link rel="icon" type="image/png" href="favicon.ico"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/iframe-resizer/3.5.16/iframeResizer.min.js" type="text/javascript"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+<link rel="stylesheet" href="styles.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-inverse  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html"></a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">
+    <span class="fa fa-home"></span>
+     
+    Home
+  </a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="glyphicon glyphicon-list-alt"></span>
+     
+    Main Experiments
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li class="dropdown-header">Materials, data, analysis, stimuli, print versions, and demos</li>
+    <li>
+      <a href="exp1a_mat.html">Experiment 1a</a>
+    </li>
+    <li>
+      <a href="exp1b_mat.html">Experiment 1b</a>
+    </li>
+    <li>
+      <a href="exp1c_mat.html">Experiment 1c</a>
+    </li>
+    <li>
+      <a href="exp2_mat.html">Experiment 2a</a>
+    </li>
+    <li>
+      <a href="exp2b_mat.html">Experiment 2b</a>
+    </li>
+    <li>
+      <a href="exp3_mat.html">Experiment 3</a>
+    </li>
+  </ul>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    <span class="glyphicon glyphicon-inbox"></span>
+     
+    Supplementary and Pilot Studies
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li class="dropdown-header">Summary of Supplementary Study</li>
+    <li>
+      <a href="expSup_mat.html">Supplementary Study</a>
+    </li>
+    <li class="dropdown-header">Summary of Pilot Study of Experiment 3</li>
+    <li>
+      <a href="exp3_pilot_mat.html">Pilot Study Exp. 3</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Experiment 3 pilot</h1>
+
+</div>
+
+
+<style>
+body {
+    font-family: 'Muli';
+    font-size: 14px;
+}
+</style>
+<!--
+<h2><font style="color:lightgrey;"> Stimuli </font></h1>
+-->
+<p><br></p>
+<p>This study was a pilot study of Experiment 3. More information is
+given in the summary section below.</p>
+<hr />
+<div id="demo-version-of-pilot-study" class="section level1" number="1">
+<h1><span class="header-section-number">1</span> Demo Version of Pilot
+Study</h1>
+<p>To see a demo of the experiment in a separate browser window, click
+<a href="MainExperiments/Exp3_pilot/experiment_files/task_local_demo/Exp_demo.html" target="_blank">here</a>.</p>
+<p>To download the program files of the experiment, click <a
+href="MainExperiments/Exp3_pilot/experiment_files.zip">here</a>.</p>
+<hr />
+</div>
+<div id="data" class="section level1" number="2">
+<h1><span class="header-section-number">2</span> Data</h1>
+<ul>
+<li><a
+href="MainExperiments/Exp3_pilot/data_and_analyses/exp_data.zip">Download
+Experimental data</a> [.csv-file; delimiter = “,”]</li>
+</ul>
+<p>Please note: 200 subjects were tested in this pilot experiment, but
+the data set contains 202 rows because two subjects happened to appear
+in two rows (i.e., they appeared twice in the data set), presumably due
+to a recording error. These are the subjects with subject codes
+(subj_code): “8R9V4veIAuw1” and “2lkGumre6eN4n”. In the analysis script
+that can be downloaded below, these duplicate entries are deleted in a
+first step.</p>
+<div id="data-set-information" class="section level2" number="2.1">
+<h2><span class="header-section-number">2.1</span> Data set
+information</h2>
+<p>The data set contains the following columns:</p>
+<ul>
+<li><strong>subj_code</strong>: a subject code</li>
+<li><strong>condition</strong>: condition variable (1 to 4)</li>
+<li><strong>desktop_conf</strong>: confirmation that desktop PC was
+used</li>
+<li><strong>attent_conf</strong>: confirmation that subj. is willing to
+pay attention</li>
+<li><strong>latent_feature</strong>: the latent feature in the test case
+(beak vs. feet)</li>
+<li><strong>LS_bias_probe_stim</strong>: the latent scope test pic
+subjects saw</li>
+<li><strong>scale_orient</strong>: counterbalancing factor coding if
+narrow scope explan. was on the left or right side of the rating
+scale</li>
+<li><strong>instr_tests</strong>: number of attempts it took a subject
+to pass instruction test</li>
+<li><strong>LS_bias_probe_rating</strong>: subjects rating for the
+latent scope test probe</li>
+<li><strong>explanation</strong>: subjects explanation of their latent
+scope test probe rating</li>
+<li><strong>bluefeet_choice</strong>: subjects’ selected explanation for
+the additional probe without latent scope (duck with blue feet and
+normal beak)</li>
+<li><strong>bluebeak_choice</strong>: subjects’ selected explanation for
+the additional probe without latent scope (duck with blue beak and
+normal feet)</li>
+<li><strong>typical_choice</strong>: subjects’ selected explanation for
+the additional probe without latent scope (duck with normal beak and
+normal feet)</li>
+<li><strong>bluefeet_bluebeak_choice</strong>: subjects’ selected
+explanation for the additional probe without latent scope (duck with
+blue beak and blue feet)</li>
+<li><strong>age</strong>: subjects’ age</li>
+<li><strong>gender</strong>: subjects’ gender</li>
+<li><strong>tech_issues</strong>: subjects report of technical
+issues</li>
+<li><strong>rating_rec</strong>: recdoded ratings for the latent scope
+bias probe (so that negative values mean narrow scope pref. and positive
+ratings mean braod scope pref.)</li>
+</ul>
+<hr />
+</div>
+</div>
+<div id="analysis-script" class="section level1" number="3">
+<h1><span class="header-section-number">3</span> Analysis Script</h1>
+<ul>
+<li><a
+href="MainExperiments/Exp3_pilot/data_and_analyses/Exp_Analysis.Rmd">View
+R-Markdown code</a></li>
+<li><a
+href="MainExperiments/Exp3_pilot/data_and_analyses/Exp_Analysis.zip">Download
+R-Markdown code</a></li>
+<li><a
+href="MainExperiments/Exp3_pilot/data_and_analyses/Exp_Analysis.html">View
+knitted/ compiled R-Markdown</a> (web view of analysis)</li>
+</ul>
+<p>Please note: 200 subjects were tested in this experiment, but the
+data set contains 202 rows because two subjects happened to appear in
+two rows (i.e., they appeared twice in the data set), presumably due to
+a recording error. These are the subjects with subject codes
+(subj_code): “8R9V4veIAuw1” and “2lkGumre6eN4n”. In the analysis script
+that can be downloaded above, these duplicate entries are deleted in a
+first step.</p>
+</div>
+<div id="analysis-of-subjects-explanations" class="section level1"
+number="4">
+<h1><span class="header-section-number">4</span> Analysis of subjects’
+explanations</h1>
+<ul>
+<li><a
+href="MainExperiments/Exp3_pilot/data_and_analyses/Exp_Analysis_subject_explanations.Rmd">View
+R-Markdown code</a></li>
+<li><a
+href="MainExperiments/Exp3_pilot/data_and_analyses/Exp_Analysis_subject_explanations.zip">Download
+R-Markdown code</a></li>
+<li><a
+href="MainExperiments/Exp3_pilot/data_and_analyses/Exp_Analysis_subject_explanations.html">View
+knitted/ compiled R-Markdown</a> (web view of analysis)</li>
+</ul>
+<p>Note: A .csv file containing all subject explanations is included in
+the folder that come with the R-Markdown code download.</p>
+<p>Please note: 200 subjects were tested in this experiment, but the
+data set contains 202 rows because two subjects happened to appear in
+two rows (i.e., they appeared twice in the data set), presumably due to
+a recording error. These are the subjects with subject codes
+(subj_code): “8R9V4veIAuw1” and “2lkGumre6eN4n”. In the analysis script
+of subjects’ explanations that can be downloaded above, these duplicate
+entries are deleted in a first step.</p>
+</div>
+<div id="summary-of-the-pilot-study" class="section level1" number="5">
+<h1><span class="header-section-number">5</span> Summary of the pilot
+study<a name="summary"></a></h1>
+<p>The main study implemented some changes based on what could be
+learned from this pilot study. For this reason, the pilot study is
+described here in greater detail.</p>
+<p>The study used the same scenario as the main study, but only tested
+condition with explicit rate information. In the pilot study, subjects
+were given information about the base rates of the three different
+mutations. However, the factor that is actually crucial according to the
+inferred evidence account is information about the rate of the (latent)
+feature(s). For this reason, the scenario description of the main study
+deviated in this respect from the pilot study.</p>
+<p>In the pilot study, the names for the three mutations were “BkFt2”
+for the mutation causing a blue beak and blue feet, “Bk1” for the
+mutation causing only a blue beak, and “Ft1” for the mutation causing
+only blue feet. This was also changed in the main study, because these
+labels tended to confuse some participants in a problematic way. I will
+say more to this below when I summarize the results.</p>
+<p>Another difference from the main study was the wording used in a
+response option for the simplicity probes. The phrasing in the option
+for the co-occurrence of both single-effect mutations read “This duck
+has a Bk1 mutation (blue beak only) and a Ft1 mutation (blue feet
+only)”. Apart from the new mutation names, this option in the main study
+left out the words “only”.</p>
+<p>The procedure of the pilot study was otherwise identical to the one
+of the main study. Readers who are interested and prefer not to read the
+text below may run the demo version of the pilot study. The link is
+provided above.</p>
+<div id="participants" class="section level2" number="5.1">
+<h2><span class="header-section-number">5.1</span> Participants</h2>
+<p>Two hundred subjects (<span class="math inline">\(M_{age}\,=
+37.44\)</span>, <span class="math inline">\(SD_{age}\,= 11.10\)</span>,
+age range 19 to 75 years) recruited via the online platform participated
+in this study and provided complete data. The inclusion and exclusion
+criteria were the same as in the previous studies. Subjects from
+previous studies of this experimental series were excluded from
+participation. The stopping criterion for data collection was a certain
+degree of estimation precision of group means. To detect even small
+narrow latent scope biases, it was decided that the 95% CI of the mean
+should be <span class="math inline">\(\le~0.5\)</span> points on the
+eleven-point rating scale. At the same time, there should be equally
+many subjects in each condition (there were four between-subjects
+conditions that resulted from two counterbalancing factors that will be
+described below). This degree of estimation precision was reached after
+<span class="math inline">\(n~= 50\)</span> subjects per condition (CI
+width of overall mean <span class="math inline">\(=~0.45\)</span>).</p>
+</div>
+<div id="design-and-procedure" class="section level2" number="5.2">
+<h2><span class="header-section-number">5.2</span> Design and
+Procedure</h2>
+<p>The study had a within-subject design as all subjects saw all
+different test stimuli shown during the test phase. However, the
+unobserved feature (beak vs. feet) of the narrow-latent scope bias probe
+was counterbalanced between subjects. A second counterbalancing factor
+was the orientation of the rating scale for that probe.</p>
+<p>Subjects read a fictitious scenario about color abnormalities that
+biologists detected in a duck population of a Northern Italian lake.
+Subjects learned that some ducks have been found to have blue beaks,
+blue feet, or both. These color abnormalities were found to be the
+result of different independent gene mutations, called BkFt2 (blue beak
+and feet), Bk1 (blue beak), and Ft1 (blue feet). Together with the short
+scenario description, subjects also saw an illustration. The main
+scenario description read:</p>
+<blockquote>
+<p>Please read the following fictitious scenario thoroughly:</p>
+<p>Biologists have noticed a peculiar phenomenon in the duck population
+of lake Caldazzo, a remote mountain lake in Northern Italy: Some ducks
+of lake Caldazzo happen to have blue feet (instead of the typical
+orange), others happen to have blue beaks (instead of the typical
+yellow), and yet others happen to have both blue feet and blue
+beaks.</p>
+<p>It was soon found out that these abnormalities are caused by genetic
+mutations existing in some ducks of the duck population of lake
+Caldazzo.</p>
+<p>Three mutations explain the observed color deviations:</p>
+<ul>
+<li>A mutation called BkFt2, leading to a blue beak and blue feet.</li>
+<li>A mutation called Bk1, leading only to a blue beak.</li>
+<li>And a mutation called Ft1, leading only to blue feet.</li>
+</ul>
+A graphic summary of what these mutations do is given below. Please
+study this information carefully. Your understanding of these mutations
+and their effects on duck color is crucial for the present study.
+</blockquote>
+<p>After this initial information, subjects proceeded to a new screen
+where they learned about the prevalence of each mutation. They learned
+that all three mutations were rare; they all had a prevalence of <span
+class="math inline">\(5\%\)</span>. A low base rate was used because
+this should increase the tendency to commit narrow latent scope biases
+according to the inferred evidence account (Johnson et al., 2016).
+Subjects also learned on that screen that the three mutations were
+causally independent. They read: ``Also, the mutations occur
+independently of each other, which means that having one of the
+mutations has no influence on the probability of having another
+mutation.’’.</p>
+<p>Subjects had to pass a comprehension test. They had to answer three
+multiple-choice questions testing (1) their knowledge of what the three
+different mutations do, (2) their understanding of what it means that
+the mutations are independent, and (3) their knowledge of each
+mutation’s prevalence (for the exact wordings, see the demo provided at
+the repository site). On a second screen of the comprehension test,
+subjects provided ratings to three additional test questions that again
+probed their understanding of the mutations’ prevalence, but this time
+in a different format. This additional prevalence check was added to
+ensure that it was as clear as possible to subjects that the mutations
+and their effects are rare, which should boost narrow latent scope
+biases according to the inferred evidence account. For each mutation,
+subjects were asked: ``Imagine a perfectly reliable test that always
+finds a [BkFt2, Bk1, Ft1] mutation in a duck if that mutation is
+present. If such a test were to be conducted in a fully representative
+group of 100 ducks, in how many of them would the test be expected to
+detect the presence of a [BkFt2, Bk1, Ft1] mutation?’’ Subjects provided
+their responses on 20-point, 5-steps, rating scales ranging from 5 (the
+correct answer) to 100.</p>
+<p>Subjects who passed the comprehension test proceeded to the test
+phase. Subjects who failed the test were led back to the instruction
+screen and then had a new chance to pass the test. The data of subjects
+who needed more than three attempts were excluded from all analyses.
+Subjects who passed the comprehension test were informed that they were
+going to see a number of pictures of ducks that were captured by a
+wildlife photo trap. They also learned that they were going to be asked
+for the most probable explanation of the ducks’ appearances.</p>
+<p>Subjects were shown five test pictures of ducks. The first test
+picture always was one of the two possible narrow latent scope bias
+probes. A prompt above the picture read: “The camera trap that was
+installed at the lakeside took the following picture of a duck that
+passed by”. Subjects then were asked the following test question,
+displayed on the same screen below the picture: “Based on what you’ve
+learned, what is the more probable explanation for this duck’s
+appearance?” Responses were given on an eleven-point rating scale with
+the endpoints labeled “Definitely a Bk1 mutation (blue beak only)” and
+“Definitely a BkFt2 mutation (blue beak and feet)”, and the midpoint
+labeled ``Both equally likely’’. Whether the narrow or the broad scope
+explanation was on the left or the right endpoint of the scale (scale
+orientation) was counterbalanced between subjects. As in previous
+experiments, on a subsequent screen subjects were also asked to write
+brief explanations of their rating.</p>
+<p>In the remaining part of the test phase, subjects were shown four
+probes without unobserved features. These pictures were shown in random
+order. For each picture, subjects answered the following question:
+``Based on what you’ve learned, what is the most probable explanation
+for this duck’s appearance?’’ Subjects selected an answer from a list of
+the following seven possibilities (this test question format was adopted
+from experiments of Lombrozo (2007):</p>
+<blockquote>
+<ul>
+<li>This duck has BkFt2 mutation (blue beak and blue feet) and a Bk1
+mutation (blue beak).
+<ul>
+<li>This duck has a BkFt2 mutation (blue beak and blue feet).</li>
+<li>This duck has a Bk1 mutation (blue beak).</li>
+<li>This duck has a BkFt2 mutation (blue beak and blue feet) and Ft1
+mutation (blue feet).</li>
+<li>This duck has a Ft1 mutation (blue feet).</li>
+<li>This duck has no mutation affecting beak and feet color.</li>
+<li>This duck has a Bk1 mutation (blue beak only) and a Ft1 mutation
+(blue feet only).</li>
+</ul></li>
+</ul>
+</blockquote>
+<p>The order of these possibilities was randomized between subjects but
+every participant saw the same order for all four probes.</p>
+<p>Subjects then provided demographic data, had the chance to report
+technical problems that may have occurred during the study, and finished
+the experiment on a short debriefing screen.</p>
+</div>
+<div id="results" class="section level2" number="5.3">
+<h2><span class="header-section-number">5.3</span> Results</h2>
+<div id="subjects-ratings-for-the-narrow-latent-scope-bias-probe"
+class="section level3" number="5.3.1">
+<h3><span class="header-section-number">5.3.1</span> Subjects’ ratings
+for the narrow latent scope bias probe</h3>
+<p>The results for the narrow latent scope bias are shown in Fig. 1. As
+can be seen there, an overall only small narrow latent scope bias was
+found (<span class="math inline">\(M~= -0.61\)</span>, 95% CI [<span
+class="math inline">\(-0.83, -0.39\)</span>]). Also, this bias resulted
+from a minority of participants, while most subjects gave correct
+answers (Median <span class="math inline">\(= 0\)</span>, Mode <span
+class="math inline">\(= 0\)</span>).</p>
+<p><img
+src="MainExperiments/Exp3_pilot/data_and_analyses/results_means_mainDV.svg"
+alt="Fig. 1 Subjects’ ratings for the unobserved feature probe." />
+<br></p>
+<p>Fig. 2 shows the different categories of subject ratings. It can be
+seen there that, of the 200 participants in this study, 80% (95% CI
+[<span class="math inline">\(0.75, 0.85\)</span>]) indicated that both
+explanations were equally likely, while 19% (95% CI [<span
+class="math inline">\(0.14, 0.25\)</span>]) indicated that the narrow
+latent scope explanation was more likely.</p>
+<p><img
+src="MainExperiments/Exp3_pilot/data_and_analyses/categories.svg"
+alt="Fig. 2 Proportions of subjects having certain explanatory preferences as indicated by their ratings." />
+<br></p>
+</div>
+<div id="subjects-explanations" class="section level3" number="5.3.2">
+<h3><span class="header-section-number">5.3.2</span> Subjects’
+explanations</h3>
+<p>The table below summarizes relevant explanation categories that were
+identified.</p>
+<hr />
+<table>
+<colgroup>
+<col width="86%" />
+<col width="13%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Explanation category</th>
+<th>n (%)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Clearly stating that both explanations are equally likely</td>
+<td>138 (69%)</td>
+</tr>
+<tr class="even">
+<td>Clearly describing the reasoning process assumed by inferred
+evidence account</td>
+<td>9 (4%)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p>As in previous experiments, the explanations of subjects who gave
+unbiased ratings tended to point out the statistical facts of the
+scenario. 69% of the explanations clearly described that both possible
+mutations are equally likely to explain the test case’s appearance. For
+example: “I couldn’t see the ducks feet so don’t know what colour they
+are. It had a blue beak so it could have been either Bk1 or BkFt2. Each
+of these has the same probability so I chose equal.”, or “We can’t see
+the feet of the duck so we don’t know if it has blue feet. Therefore
+there’s no way to determine which mutation of the two it has, so based
+on all the information we have, we can only say there’s a 50/50
+chance.”</p>
+<p>A number of subjects who wrote correct explanations even explicitly
+referred the mutations’ low (identical) prevalence: “because their is a
+5% chance of getting a mutation of a blue beak and blue feet and a 5%
+chance of getting a mutation of just a blue beak. So their both an equal
+chance.”, and “Because they both have the same overall probability (5%),
+the chances of the duck being either BkFt2 or Bk1 are equal. This is
+because both of these mutations cause the beak to turn blue like in the
+picture provided. We can’t see the feet of the duck but there’s a 50%
+chance that they’re blue, and a 50% chance that they’re yellow.”.</p>
+<p>The kinds of explanations of the subgroup of subjects whose ratings
+favored the narrow latent scope cause varied more. Some indicated that
+they expressed a preference for the narrow latent scope cause because
+they misunderstood aspects of the scenario. An example is: “the chance
+of a duck having both blue feet and blue beak is lesser than having just
+a blue feet or beak.”. Some also wrote that seeing the undiagnostic
+feature (blue beak or blue feet, depending on condition) would imply
+that the mutation causing (only) that feature must be present and that
+the mutation causing the unobserved feature might be present as well.
+These subjects seemed to have thought that the broad scope mutation
+(BkFt2) was actually a combination/co-occurrence of the two narrow scope
+mutations (Bk1 and Ft1). An example is: “Definitely Bk1, but since we
+cannot see the feet, there is a chance of ft1 aswell making it bkft2.
+but we cannot be certain”.</p>
+<p>Explanations that clearly described the process leading to genuine
+narrow latent scope biases according to the inferred evidence account
+were provided by 4% of the subjects. Examples are: “The blue beak was a
+mutation. The feet couldn’t be seen as they were underwater but they had
+a 5% chance of being blue as the mutation did not have any dependencies
+on other mutations. So it was highly likely there was only 1 mutation”,
+“It’s certain that the duck has a blue beak. It’s unknown as to whether
+it has blue feet. Given the chance of yellow feet is much higher than
+the chance of blue, I selected my answer accordingly.”, and “The blue
+beak can be seen as a definite, but there is only a 5% chance that the
+duck also has blue feet, so the probability dictates the duck will have
+a blue beak only.”. Finding such explanations provides evidence that
+these subjects (and possibly others who did not describe what influenced
+them clearly enough) in their preference for the narrow latent scope
+cause were indeed influenced by low feature base rate.</p>
+<p>In sum, the results of this pilot study indicate that a salient,
+explicit instruction of low feature base rates caused at least some
+subjects to commit a non-normative narrow latent scope bias. However,
+even under this “extreme” condition, most subjects still were not
+biased. Most responded correctly and provided the correct explanation.
+The results, therefore, also suggest that in scenarios in which feature
+base rates are less salient, or not mentioned at all (as is the case,
+for example, in scenarios like the Tokolo tribe scenario), reasoners’
+tendency to be influenced by them seems rather unlikely.</p>
+</div>
+<div id="results-for-the-probes-without-unobserved-features"
+class="section level3" number="5.3.3">
+<h3><span class="header-section-number">5.3.3</span> Results for the
+probes without unobserved features</h3>
+<p><br></p>
+<p><img
+src="MainExperiments/Exp3_pilot/data_and_analyses/simplicity_probes.png"
+alt="Fig. 3 Results for the non-latent features probes" /> <br></p>
+<p>Another goal of this study was to see if reasoners’ preference for
+simpler over more complex explanations could be replicated, which would
+provide converging evidence that reasoners explanatory preferences tend
+to be normative.</p>
+<p>The results for the remaining probes without unobserved features are
+shown in Fig. 3. Each panel shows the distribution of explanation
+selections for a specific probe. For the probe showing a duck with
+“normal” beak and feet, all subjects said that the most probable
+explanation was “no mutation”. For the probe showing a duck with a blue
+beak, <span class="math inline">\(99.5\)</span>% (95% CI [<span
+class="math inline">\(0.99, 1.0\)</span>]) said that the most likely
+explanation was a Bk1 mutation. Similarly, <span
+class="math inline">\(99\)</span>% (95% CI [<span
+class="math inline">\(0.98, 1.0\)</span>]) said that an Ft1 mutation was
+the most likely explanation for the probe showing a duck with blue feet.
+The results for these three probes show that subjects correctly
+understood the scenario.</p>
+<p>The theoretically most relevant probe in this set was the one showing
+a duck with both blue feet and a blue beak. Based on previous studies
+documenting a preference for explanatory simplicity in such cases, the
+prediction was that subjects would tend to say that a BkFt2 mutation is
+the most probable explanation. The fourth panel in Fig. 3 shows that
+this was the case. The BkFt2 explanation was selected by <span
+class="math inline">\(90.5\)</span>% (95% CI [<span
+class="math inline">\(0.87, 0.94\)</span>]) of participants; only <span
+class="math inline">\(9.5\)</span>% of participants selected a different
+explanation in this case.</p>
+</div>
+</div>
+</div>
+<div
+id="insights-from-this-pilot-that-led-to-changes-for-the-main-study"
+class="section level1" number="6">
+<h1><span class="header-section-number">6</span> Insights from this
+pilot that led to changes for the main study</h1>
+<p>A relevant insight from this pilot study was that the names of the
+fictitious mutations are not optimal. This became clear from the
+explanations that some subjects wrote. Some subjects expressed the
+belief that the mutation causing to effects is actually a combination of
+the two single-effect mutations. This belief might have resulted from
+the way the mutations were called: <em>BkFt2</em> sounds like a
+combination/ co-occurrence of <em>Bk1</em> and <em>Ft1</em>. A problem
+is that subjects who believe this have a good reason to select the
+narrow latent scope explanation for the narrow latent scope probe. To
+avoid this confusion in the main study, the mutations there were called
+<em>PIX67</em>, <em>TOX20</em>, and <em>NAX20</em>.</p>
+<p>A second change in the main study concerns what base rate information
+subjects received. In this pilot study, subjects received information
+about the base rates of the three different explanations. What is the
+driving factor according to the inferred evidence account, however, is
+information about the base rate of the unobserved feature. This rate is
+only indirectly (and only partly) given by the base rates of
+explanations (because there might be alternative causes of the feature).
+The decision was made to present feature rate information rather than
+explanation rate information in the main study.</p>
+</div>
+
+<p><font size="-1.5">2023 ANONYMIZED AUTHOR.</font></p>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

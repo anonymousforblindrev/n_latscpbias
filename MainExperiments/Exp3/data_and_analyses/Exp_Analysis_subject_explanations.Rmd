@@ -38,13 +38,6 @@ explan_data <- read_delim("subject_explanations.csv",
     delim = ";", escape_double = FALSE, trim_ws = TRUE)
 ```
 
-```{r}
-# remove subject with duplicate entry
-explan_data <- explan_data %>% distinct(subj_code, .keep_all = TRUE)
-
-# Note that two rows appear twice, and the duplicates must be deleted
-```
-
 
 
 # Data preparation
@@ -68,7 +61,7 @@ tdata_long$scale_orient <- factor(tdata_long$scale_orient, levels = c("narrow_le
 tdata_long$`Correct explanation`[is.na(tdata_long$`Correct explanation`)] <- "0"
 tdata_long$`Unclear explanation`[is.na(tdata_long$`Unclear explanation`)] <- "0"
 tdata_long$`Inferred absence because of low feature base rate`[is.na(tdata_long$`Inferred absence because of low feature base rate`)] <- "0"
-tdata_long$`Inferred absence of latent feature due to visibility`[is.na(tdata_long$`Inferred absence of latent feature due to visibility`)] <- "0"
+tdata_long$`Inferred absence of latent feature`[is.na(tdata_long$`Inferred absence of latent feature`)] <- "0"
 
 
 ```
@@ -87,7 +80,7 @@ explan_data$`Unclear explanation` <- as.factor(explan_data$`Unclear explanation`
 
 explan_data$`Inferred absence because of low feature base rate` <- as.factor(explan_data$`Inferred absence because of low feature base rate`)
 
-explan_data$`Inferred absence of latent feature due to visibility` <- as.factor(explan_data$`Inferred absence of latent feature due to visibility`)
+explan_data$`Inferred absence of latent feature` <- as.factor(explan_data$`Inferred absence of latent feature`)
 
 ```
 
@@ -99,7 +92,7 @@ explan_data$`Inferred absence of latent feature due to visibility` <- as.factor(
 ```{r}
 # create a summary dataset that also contains the percentages
 plotdata_between <- explan_data %>%
-  group_by(`Correct explanation`) %>%
+  group_by(prevalence, `Correct explanation`) %>%
   summarize(n = n()) %>% 
   mutate(pct = n/sum(n),
          lbl = scales::percent(pct))
@@ -119,7 +112,7 @@ g<- ggplot(plotdata,
        aes(x = "",
            y = pct,
            fill = `Correct explanation`)) +
-  #facet_grid( ~ Features)+
+  facet_grid( ~ prevalence)+
   geom_bar(stat = "identity",
            position = "fill") +
   scale_y_continuous(limits = seq(0, 2),
@@ -135,7 +128,7 @@ g<- ggplot(plotdata,
   scale_fill_brewer(palette = "Pastel1") +
   labs(y = "Percentage", 
        fill = "Correct Explanation",
-       x = "Features")+
+       x = "Condition")+
   theme(legend.position = "top", axis.title = element_text(size = 15), axis.text = element_text(size = 13, color = "black"),
         legend.text = element_text(size = 13),legend.title = element_text(size = 13))+
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
@@ -143,14 +136,17 @@ g<- ggplot(plotdata,
 g
 ```
 
-
+```{r}
+normative <- prop.test(x = c(plotdata_between$n[2], plotdata_between$n[4]), n = c(280, 280), alternative = "two.sided", correct = F)
+normative
+```
 
 2. proportions of subjects who inferred the absence of the unobserved feature due to its low overall probability (inferred evidence account)
 
 ```{r}
 # create a summary dataset that also contains the percentages
 plotdata_between <- explan_data %>%
-  group_by(`Inferred absence because of low feature base rate`) %>%
+  group_by(prevalence, `Inferred absence because of low feature base rate`) %>%
   summarize(n = n()) %>% 
   mutate(pct = n/sum(n),
          lbl = scales::percent(pct))
@@ -169,7 +165,7 @@ g<- ggplot(plotdata,
        aes(x = "",
            y = pct,
            fill = `Inferred absence because of low feature base rate`)) +
-  #facet_grid( ~ Features)+
+  facet_grid( ~ prevalence)+
   geom_bar(stat = "identity",
            position = "fill") +
   scale_y_continuous(limits = seq(0, 2),
@@ -193,4 +189,7 @@ g<- ggplot(plotdata,
 g
 ```
 
-
+```{r}
+rate <- prop.test(x = c(0, plotdata_between$n[3]), n = c(280, 280), alternative = "less", correct = F)
+rate
+```

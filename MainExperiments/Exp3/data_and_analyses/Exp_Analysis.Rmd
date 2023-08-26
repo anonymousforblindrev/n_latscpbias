@@ -11,7 +11,6 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
 # packages
 library(ez)
 library(reshape2)
@@ -38,16 +37,6 @@ tdata <- read_csv("exp_data.csv")
 ```
 
 
-
-```{r}
-# remove subject with duplicate entry
-tdata <- tdata %>% distinct(subj_code, .keep_all = TRUE)
-
-# Note that two rows appear twice, and the duplicates must be deleted
-```
-
-
-
 # Subject demographics
 
 ```{r}
@@ -70,24 +59,17 @@ Check n in each condition:
 ```{r}
 table(tdata$condition)
 ```
-There are 4 conditions because we manipulated the latent feature (beak vs. feet) and counterbalanced the orientation of the rating scale (narrow left vs. narrow right)
-
-
-# Check mean and CI to estimate the bias
+There are 8 conditions because what was manipulated whether rate information was given or not, the latent feature (beak vs. feet), varied and counterbalanced the orientation of the rating scale (narrow left vs. narrow right).
 
 ```{r}
-# check width of the means 95% cis (is not supposed to be grater than 0.5)
-library(rcompanion)
-ci_table <- groupwiseMean(rating_rec ~ 1,
-              data        = tdata,
-              traditional = FALSE,
-              percentile  = TRUE)
+# make rate information factor a factor (its called "prevalence" in the data frame)
 
+tdata$prevalence <- factor(tdata$prevalence, levels = c("omitted", "presented"), labels = c("omitted", "presented"))
 
-ci_table
-
-(ci_width <- ci_table$Percentile.upper - ci_table$Percentile.lower)
 ```
+
+
+
 
 # Graphs and summaries
 
@@ -102,7 +84,7 @@ myTheme <- theme(plot.title = element_text(face="bold", size = 22),
         legend.text = element_text(size = 18),
         legend.title = element_text(face = "bold", size = 18),
         strip.text.x = element_text(size = 18),
-        #panel.grid.major = element_blank(), 
+        panel.grid.major = element_blank(), 
         panel.grid.minor = element_blank(), 
         panel.background = element_blank(), 
         axis.line.x = element_line(colour = "black"), 
@@ -126,56 +108,131 @@ theme_set(theme_light(base_size = 20, base_family = "Poppins"))
 
 # new labes for the facets 
 
-g <- ggplot(tdata_sub, aes(x = 0.5, y = valueJitter)) +
+g <- ggplot(tdata_sub, aes(x = prevalence, y = valueJitter)) +
   guides(fill=FALSE)+
-  #facet_grid( ~ dv_query)+
+  #facet_grid( ~ Knowledge)+
   #ggtitle("Subjects' causal srength ratings") +
   scale_y_continuous(limits = c(-5.3, 5.3), breaks=seq(-5, 5, 1), expand = c(0,0)) +
-  #scale_x_discrete(labels=c("Probe")) +
+  #scale_x_discrete(labels=c("Spear and \nnet", "Feathers and \ntooth")) +
   #stat_summary(fun.y = mean, geom = "bar", position = "dodge", colour = "black", alpha =0.5) +
-  geom_violinhalf(aes(y = rating_rec, group = NA, fill = "#66c2a5"), color = NA, 
+  geom_violinhalf(aes(y = rating_rec, group = prevalence, fill = prevalence), color = NA, 
                   position=position_dodge(1), alpha = 0.4)+
   #geom_line(position = pd, color = "black", size = 1, alpha=0.04) +
   geom_hline(yintercept=0, linetype="dashed", color = "black")+
-  geom_jitter(aes(color = "#66c2a5"), alpha = 0.5, width = 0.15, height = 0.3) +
-  stat_summary(aes(y = rating_rec, group=NA), fun.data = mean_cl_boot, 
+  geom_jitter(aes(color = prevalence), alpha = 0.5, width = 0.15, height = 0.2) +
+  stat_summary(aes(y = rating_rec, group=1), fun.data = mean_cl_boot, 
                geom = "errorbar", width = 0, size = 1) +
-  stat_summary(aes(y = rating_rec, group=1, fill = "#66c2a5"), fun.y=mean, geom="point", 
+  stat_summary(aes(y = rating_rec, group=1), fun.y=mean, geom="line", 
+               color = "black", shape = 22, size = 1, alpha = .7)+
+  stat_summary(aes(y = rating_rec, group=1, fill = prevalence), fun.y=mean, geom="point", 
                color = "black", shape = 22, size = 2, group=1, alpha = 1)+
   stat_summary(aes(y = rating_rec,group=1), fun.y=median, geom="point", color = "black", shape = 3, size = 4, 
                group=1, alpha = 1, position = position_dodge(width = 0.5))+
-  labs(x = "", y = "Explanation rating") +
+  labs(x = "Feature rate information", y = "Explanation rating") +
   scale_color_manual(name = "Strength",values=c("#66c2a5", "#e78ac3", "#8da0cb", "#a6d854"))+
   scale_fill_manual(name = "Strength",values=c("#66c2a5", "#e78ac3", "#8da0cb", "#a6d854"))+
-  annotate("text", x = 0, y = 3.5, label = c("broad-scope"), angle = 90)+
-  annotate("text", x = 0, y = -3.5, label = c("narrow-scope"), angle = 90)+
+  annotate("text", x = 0.5, y = 3.5, label = c("broad-scope"), angle = 90)+
+  annotate("text", x = 0.5, y = -3.5, label = c("narrow-scope"), angle = 90)+
   theme(legend.position = "none")+
   myTheme+
-   theme(panel.grid.major = element_line(color = "lightgrey",
+  theme(panel.grid.major = element_line(color = "lightgrey",
                                         size = 0.5,
-                                        linetype = 'dotted'),
-         axis.text.x = element_blank(),
-         axis.title.x = element_blank(),
-         axis.ticks.x = element_blank())+
+                                        linetype = 'dotted'))+
   stat_summary(aes(label=round(after_stat(y),2)), fun.y=mean, geom="text", size=5,
-             vjust = -8)
+             vjust = -6)
+
 g
 
-
-ggsave("results_means_mainDV.svg",width=5,height=5)
-ggsave("results_means_mainDV.pdf",width=5,height=5)
+ggsave("results_means.svg",width=4.5,height=5)
+ggsave("results_means.pdf",width=4.5,height=5)
+#ggsave("results_means_selection.pdf",width=11,height=5)
 ```
-
-
-## Subject categories
-
-Get the values of the CIs shown in the plot:
 
 ```{r}
-values <- ggplot_build(g)$data[[4]] # values are shown in the 4th panel 
-values
+library(ggridges)
+g2 <- ggplot(tdata_long, aes(x = rating_rec, y = prevalence, fill = prevalence)) +
+  scale_x_continuous(breaks = seq(-5, 5, 1))+
+  geom_density_ridges(alpha = 0.5)+
+   #stat_summary(aes(x = rating_rec), fun.x=mean, geom="point", 
+  #             color = "black", shape = 22, size = 2, group=1, alpha = 1)+
+  scale_fill_manual(values=c("#66c2a5", "#e78ac3", "#8da0cb", "#a6d854"))+
+  #scale_fill_viridis_c(name = "Explanation \nRating", option = "C", breaks=c(-5,0,5), labels=c("narrow scope", "no preference", "broad scope"))+
+  labs(x = "Explanation rating", y = "Test question") +
+  scale_y_discrete(limits=rev)+
+  myTheme+
+  theme_light(base_family = "Poppins", base_size = 20)+
+  theme(panel.grid = element_blank(), axis.text = element_text(colour ="black"))+
+  theme(legend.position="none",
+        legend.title=element_blank(),legend.key.width = unit(1.95, 'cm'))+
+  annotate("text", y = 0.7, x = 4, label = c("broad-scope"), angle = 0)+
+  annotate("text", y = 0.7, x = -4, label = c("narrow-scope"), angle = 0)+
+  theme(axis.text.y = element_text(size = 14, angle = 0))
+
+g2
+
+ggsave("results_dist.svg",width=7,height=5)
+ggsave("results_dist.pdf",width=6,height=5)
 ```
 
+
+# Test difference of group means 
+
+Note that with $N~= 560$, the sample size is at $0.7N$ of the planned final sample size ($N=800$). At this point, we're thus at the planned interim look. 
+
+The critical p-value (one-sided) at this point:
+
+```{r}
+library(rpact)
+design <- getDesignGroupSequential(
+  typeOfDesign = "asP", 
+  informationRates = c(0.7, 1), 
+  alpha = 0.05, 
+  sided = 1)
+design$stageLevels * 1
+```
+is $p~= .0395$. 
+
+Conduct t-Test: 
+
+first, check if variances are equal or not:
+
+```{r}
+(tdata_long %>%
+  group_by(prevalence) %>%
+  summarise_at(vars(rating_rec), list(name=var)) -> var)
+```
+
+Variances unequal, so apply correction in T-Test function below:
+
+```{r}
+t.test(rating_rec ~ prevalence, data = tdata_long, var.equal = F, alternative = "greater", paired = F) # two sided is used here to get the full confidence interval of the difference; note, however, that the hypothesis was a directed one (thus, alternative = "less" could have been used to get the one-sided p-value). 
+```
+empirical $p$ is smaller than the critical $p$ determined for the interim look. This also means that data collection can be terminated at this point.
+
+Cohen's d: 
+
+```{r}
+# Cohen's d
+lsr::cohensD(tdata_long$rating_rec ~ tdata_long$prevalence)
+```
+
+
+
+Get the values of the CIs of the means:
+
+```{r}
+# check width of the means 95% cis (is not supposed to be grater than 0.5)
+library(rcompanion)
+ci_table <- groupwiseMean(rating_rec ~ prevalence,
+              data        = tdata,
+              traditional = FALSE,
+              percentile  = TRUE)
+
+
+ci_table
+
+(ci_width <- ci_table$Percentile.upper - ci_table$Percentile.lower)
+```
 
 get group medians: 
 
@@ -185,7 +242,7 @@ get group medians:
 #               traditional = FALSE,
 #               percentile  = TRUE)
 
-groupwiseMedian(rating_rec ~ 1,
+groupwiseMedian(rating_rec ~ prevalence,
                 data        = tdata_long,
                 bca         = FALSE,
                 percentile  = TRUE,
@@ -193,11 +250,11 @@ groupwiseMedian(rating_rec ~ 1,
 ```
 
 
-
+# Subject categories
 
 ```{r}
 counts <- tdata_long %>%
-  group_by(rating_rec) %>%
+  group_by(prevalence, rating_rec) %>%
   summarize(n = n()) %>% 
   mutate(pct = n/sum(n),
          lbl = scales::percent(pct))
@@ -215,7 +272,7 @@ tdata_long$category[tdata_long$rating_rec == 0] <- "unbiased"
 tdata_long$category[tdata_long$rating_rec > 0] <- "broad"
 
 counts2 <- tdata_long %>%
-  group_by(category) %>%
+  group_by(prevalence, category) %>%
   summarize(n = n()) %>% 
   mutate(pct = n/sum(n),
          lbl = scales::percent(pct))
@@ -223,25 +280,41 @@ counts2 <- tdata_long %>%
 counts2
 
 counts2$category <- factor(counts2$category, levels = c("unbiased", "narrow", "broad"), labels = c("unbiased", "narrow l.s.", "broad l.s."))
-
+counts2
 ```
 
 
-Get proportion CIs for the 3 categories
+Get proportion CIs for different conditions:
 
 ```{r}
 library(PropCIs)
 library(DescTools)
 library(purrr)
 
-(MultinomCI(counts2$n,
+counts_presented <- subset(counts2, prevalence == "presented")
+
+counts_omitted <- subset(counts2, prevalence == "omitted")
+
+
+(MultinomCI(counts_omitted$n,
            conf.level=0.95,
-           method="sisonglaz") -> selection_ci)
+           method="sisonglaz") -> selection_ci_1)
   
 
-ci_low <- c(selection_ci[,2])
+(MultinomCI(counts_presented$n,
+           conf.level=0.95,
+           method="sisonglaz") -> selection_ci_2)
 
-ci_up <- c(selection_ci[,3])
+  
+
+
+
+
+ci_low <- c(selection_ci_1[,2], selection_ci_2[,2])
+
+ci_up <- c(selection_ci_1[,3], selection_ci_2[,3])
+
+
 ```
 
 
@@ -263,7 +336,8 @@ theme_set(theme_light(base_size = 12, base_family = "Poppins"))
 g<- ggplot(plotdata, 
        aes(x = category,
            y = pct,
-           fill = "#66c2a5")) +
+           fill = prevalence)) +
+  facet_grid( ~ prevalence)+
   geom_bar(stat = "identity",
            position = "dodge") +
   scale_y_continuous(limits = seq(0, 2),
@@ -273,7 +347,7 @@ g<- ggplot(plotdata,
   #coord_cartesian(xlim =c(1, 7), ylim = c(0, 1.1))+
   #coord_cartesian(clip = "off")+
   geom_text(aes(label = lbl), 
-            size = 3.5,
+            size = 4,
             position = position_dodge(width = 1),
             vjust = -3) +
   scale_fill_manual(name = "Strength",values=c("#66c2a5", "#e78ac3", "#8da0cb", "#a6d854"))+
@@ -288,16 +362,32 @@ g<- ggplot(plotdata,
     #       ymax = plotdata$ci_up, 
      #      colour = "black", size = 0.8, shape = 22, fill = Transformation, fatten = 1)+
   #annotate("text", x = pvalues_x, y = Inf, label = pvalues, size = 4, vjust = 1.8)+
-  theme(legend.position = "none", axis.title = element_text(size = 20), axis.text = element_text(size = 11, color = "black"),
-        legend.text = element_text(size = 13),legend.title = element_text(size = 13))+
+  theme(legend.position = "none", axis.title = element_text(size = 20), axis.text = element_text(size = 13, color = "black"),
+        legend.text = element_text(size = 13),legend.title = element_text(size = 13),strip.text.x = element_text(size = 13))+
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 
 g
 
-
-ggsave("categories.svg",width=5,height=5)
-ggsave("categories.pdf",width=5,height=5)
+#ggsave("selections_between.pdf",width=6,height=5)
+ggsave("categories.svg",width=7,height=5)
+ggsave("categories.pdf",width=7,height=5)
 ```
+
+Proportion tests: 
+
+1. Test if proportion of normative judgments is higher in "omitted"
+
+```{r}
+normative <- prop.test(x = c(plotdata$n[3], plotdata$n[6]), n = c(280, 280), alternative = "greater", correct = F)
+normative
+```
+2. Test if proportion of narrow latent scope biases is higher in "presented"
+
+```{r}
+narrowlsb <- prop.test(x = c(plotdata$n[5], plotdata$n[2]), n = c(280, 280), alternative = "greater", correct = F)
+narrowlsb
+```
+
 
 # Remaining results (additional test cases)
 
@@ -312,38 +402,16 @@ counts_bluefeet <- tdata_long %>%
 
 counts_bluefeet
 
-# add the missing categories to the data frame (to have them in the plot later)
-
-#This duck has a Bk1 mutation (blue beak).
-counts_bluefeet[nrow(counts_bluefeet) + 1,] <- list("Bk1", 0, 0.00, "0%")
-
-# This duck has no mutation affecting beak and feet color.
-counts_bluefeet[nrow(counts_bluefeet) + 1,] <- list("no mutation", 0, 0.00, "0%")
-
-#This duck has a BkFt2 mutation (blue beak and blue feet) and Ft1 mutation (blue feet).
-counts_bluefeet[nrow(counts_bluefeet) + 1,] <- list("BkFt2 + Ft1", 0, 0.00, "0%")
-
-#This duck has BkFt2 mutation (blue beak and blue feet) and a Bk1 mutation (blue beak).
-counts_bluefeet[nrow(counts_bluefeet) + 1,] <- list("BkFt2 + Bk1", 0, 0.00, "0%")
-
-#This duck has a Bk1 mutation (blue beak only) and a Ft1 mutation (blue feet only).
-counts_bluefeet[nrow(counts_bluefeet) + 1,] <- list("Bk1 + Ft1", 0, 0.00, "0%")
-
-
-
-counts_bluefeet
-
-
 counts_bluefeet$bluefeet_choice <- factor(counts_bluefeet$bluefeet_choice, 
-                                          levels = c("no mutation",
-                                                     "Bk1",
-                                                     "This duck has a Ft1 mutation (blue feet).",
-                                                     "This duck has a BkFt2 mutation (blue beak and blue feet).",
-                                                     "Bk1 + Ft1",
-                                                     "BkFt2 + Bk1",
-                                                     "BkFt2 + Ft1"
+                                          levels = c("This duck has no mutation affecting beak and feet color.",
+                                                     "This duck has a TOX20 mutation (blue beak).",
+                                                     "This duck has a NAX20 mutation (blue feet).",
+                                                     "This duck has a PIX67 mutation (blue beak and blue feet).",
+                                                     "This duck has a TOX20 mutation (blue beak) and a NAX20 mutation (blue feet).",
+                                                     "This duck has PIX67 mutation (blue beak and blue feet) and a TOX20 mutation (blue beak).",
+                                                     "This duck has a PIX67 mutation (blue beak and blue feet) and NAX20 mutation (blue feet)."
                                                      ),
-                                          labels = c("no mutation", "Bk1", "Ft1", "BkFt2", "Bk1 + Ft1", "BkFt2 + Bk1", "BkFt2 + Ft1"))
+                                          labels = c("no mutation", "beak", "feet", "beak and feet", "beak + feet", "beak and feet + beak", "beak and feet + feet"))
 
 
 ```
@@ -394,10 +462,10 @@ g<- ggplot(plotdata,
   #coord_cartesian(xlim =c(1, 7), ylim = c(0, 1.1))+
   #coord_cartesian(clip = "off")+
   geom_text(aes(label = lbl), 
-            size = 5,
+            size = 4,
             position = position_dodge(width = 1),
             vjust = -1.5) +
-  scale_fill_manual(name = "Selected explan.",values=c("#66c2a5", "#e78ac3", "#e6ab02", "#8da0cb", "#a6d854", "#a65628", "#e41a1c"))+
+  scale_fill_manual(name = "Selected explanation",values=c("#66c2a5", "#e78ac3", "#e6ab02", "#8da0cb", "#a6d854", "#a65628", "#e41a1c"))+
   #scale_fill_brewer(palette = "Pastel1") +
   labs(y = "Percentage", 
        fill = "Explanatory preference",
@@ -416,7 +484,7 @@ g<- ggplot(plotdata,
 
 g
 
-
+#ggsave("selections_between.pdf",width=6,height=5)
 ggsave("categories_bluefeet.svg",width=7,height=4)
 ggsave("categories_bluefeet.pdf",width=7,height=4)
 ```
@@ -441,36 +509,25 @@ counts_bluebeak
 
 # add the missing categories to the data frame (to have them in the plot later)
 
-
-counts_bluebeak[nrow(counts_bluebeak) + 1,] <- list("BkFt2", 0, 0.00, "0%")
-
-
-counts_bluebeak[nrow(counts_bluebeak) + 1,] <- list("no mutation", 0, 0.00, "0%")
+counts_bluebeak[nrow(counts_bluebeak) + 1,] <- list("This duck has a PIX67 mutation (blue beak and blue feet) and NAX20 mutation (blue feet).", 0, 0.00, "0%")
 
 
-counts_bluebeak[nrow(counts_bluebeak) + 1,] <- list("BkFt2 + Ft1", 0, 0.00, "0%")
-
-
-counts_bluebeak[nrow(counts_bluebeak) + 1,] <- list("BkFt2 + Bk1", 0, 0.00, "0%")
-
-
-counts_bluebeak[nrow(counts_bluebeak) + 1,] <- list("Bk1 + Ft1", 0, 0.00, "0%")
-
+counts_bluebeak[nrow(counts_bluebeak) + 1,] <- list("This duck has PIX67 mutation (blue beak and blue feet) and a TOX20 mutation (blue beak).", 0, 0.00, "0%")
 
 
 counts_bluebeak
 
 
 counts_bluebeak$bluebeak_choice <- factor(counts_bluebeak$bluebeak_choice, 
-                                          levels = c("no mutation",
-                                                     "This duck has a Bk1 mutation (blue beak).",
-                                                     "This duck has a Ft1 mutation (blue feet).",
-                                                     "BkFt2",
-                                                     "Bk1 + Ft1",
-                                                     "BkFt2 + Bk1",
-                                                     "BkFt2 + Ft1"
+                                          levels = c("This duck has no mutation affecting beak and feet color.",
+                                                     "This duck has a TOX20 mutation (blue beak).",
+                                                     "This duck has a NAX20 mutation (blue feet).",
+                                                     "This duck has a PIX67 mutation (blue beak and blue feet).",
+                                                     "This duck has a TOX20 mutation (blue beak) and a NAX20 mutation (blue feet).",
+                                                     "This duck has PIX67 mutation (blue beak and blue feet) and a TOX20 mutation (blue beak).",
+                                                     "This duck has a PIX67 mutation (blue beak and blue feet) and NAX20 mutation (blue feet)."
                                                      ),
-                                          labels = c("no mutation", "Bk1", "Ft1", "BkFt2", "Bk1 + Ft1", "BkFt2 + Bk1", "BkFt2 + Ft1"))
+                                          labels = c("no mutation", "beak", "feet", "beak and feet", "beak + feet", "beak and feet + beak", "beak and feet + feet"))
 
 
 ```
@@ -521,10 +578,10 @@ g<- ggplot(plotdata,
   #coord_cartesian(xlim =c(1, 7), ylim = c(0, 1.1))+
   #coord_cartesian(clip = "off")+
   geom_text(aes(label = lbl), 
-            size = 5,
+            size = 4,
             position = position_dodge(width = 1),
             vjust = -1.5) +
-  scale_fill_manual(name = "Selected explan.",values=c("#66c2a5", "#e78ac3", "#e6ab02", "#8da0cb", "#a6d854", "#a65628", "#e41a1c"))+
+  scale_fill_manual(name = "Selected explanation",values=c("#66c2a5", "#e78ac3", "#e6ab02", "#8da0cb", "#a6d854", "#a65628", "#e41a1c"))+
   #scale_fill_brewer(palette = "Pastel1") +
   labs(y = "Percentage", 
        fill = "Explanatory preference",
@@ -543,6 +600,7 @@ g<- ggplot(plotdata,
 
 g
 
+#ggsave("selections_between.pdf",width=6,height=5)
 ggsave("categories_bluebeak.svg",width=7,height=4)
 ggsave("categories_bluebeak.pdf",width=7,height=4)
 ```
@@ -568,23 +626,9 @@ counts_typical
 # add the missing categories to the data frame (to have them in the plot later)
 
 
-counts_typical[nrow(counts_typical) + 1,] <- list("BkFt2", 0, 0.00, "0%")
+counts_typical[nrow(counts_typical) + 1,] <- list("This duck has a PIX67 mutation (blue beak and blue feet) and NAX20 mutation (blue feet).", 0, 0.00, "0%")
 
-
-counts_typical[nrow(counts_typical) + 1,] <- list("Bk1", 0, 0.00, "0%")
-
-
-counts_typical[nrow(counts_typical) + 1,] <- list("Ft1", 0, 0.00, "0%")
-
-
-counts_typical[nrow(counts_typical) + 1,] <- list("BkFt2 + Ft1", 0, 0.00, "0%")
-
-
-counts_typical[nrow(counts_typical) + 1,] <- list("BkFt2 + Bk1", 0, 0.00, "0%")
-
-
-counts_typical[nrow(counts_typical) + 1,] <- list("Bk1 + Ft1", 0, 0.00, "0%")
-
+counts_typical[nrow(counts_typical) + 1,] <- list("This duck has a TOX20 mutation (blue beak).", 0, 0.00, "0%")
 
 
 counts_typical
@@ -592,14 +636,14 @@ counts_typical
 
 counts_typical$typical_choice <- factor(counts_typical$typical_choice, 
                                           levels = c("This duck has no mutation affecting beak and feet color.",
-                                                     "Bk1",
-                                                     "Ft1",
-                                                     "BkFt2",
-                                                     "Bk1 + Ft1",
-                                                     "BkFt2 + Bk1",
-                                                     "BkFt2 + Ft1"
+                                                     "This duck has a TOX20 mutation (blue beak).",
+                                                     "This duck has a NAX20 mutation (blue feet).",
+                                                     "This duck has a PIX67 mutation (blue beak and blue feet).",
+                                                     "This duck has a TOX20 mutation (blue beak) and a NAX20 mutation (blue feet).",
+                                                     "This duck has PIX67 mutation (blue beak and blue feet) and a TOX20 mutation (blue beak).",
+                                                     "This duck has a PIX67 mutation (blue beak and blue feet) and NAX20 mutation (blue feet)."
                                                      ),
-                                          labels = c("no mutation", "Bk1", "Ft1", "BkFt2", "Bk1 + Ft1", "BkFt2 + Bk1", "BkFt2 + Ft1"))
+                                          labels = c("no mutation", "beak", "feet", "beak and feet", "beak + feet", "beak and feet + beak", "beak and feet + feet"))
 
 
 counts_typical
@@ -651,10 +695,10 @@ g<- ggplot(plotdata,
   #coord_cartesian(xlim =c(1, 7), ylim = c(0, 1.1))+
   #coord_cartesian(clip = "off")+
   geom_text(aes(label = lbl), 
-            size = 5,
+            size = 4,
             position = position_dodge(width = 1),
             vjust = -1.5) +
-  scale_fill_manual(name = "Selected explan.",values=c("#66c2a5", "#e78ac3", "#e6ab02", "#8da0cb", "#a6d854", "#a65628", "#e41a1c"))+
+  scale_fill_manual(name = "Selected explanation",values=c("#66c2a5", "#e78ac3", "#e6ab02", "#8da0cb", "#a6d854", "#a65628", "#e41a1c"))+
   #scale_fill_brewer(palette = "Pastel1") +
   labs(y = "Percentage", 
        fill = "Explanatory preference",
@@ -673,7 +717,7 @@ g<- ggplot(plotdata,
 
 g
 
-
+#ggsave("selections_between.pdf",width=6,height=5)
 ggsave("categories_typical.svg",width=7,height=4)
 ggsave("categories_typical.pdf",width=7,height=4)
 ```
@@ -692,24 +736,17 @@ counts_both <- tdata_long %>%
 
 counts_both 
 
-counts_both[nrow(counts_both) + 1,] <- list("Ft1", 0, 0.00, "0%")
-
-
-counts_both[nrow(counts_both) + 1,] <- list("no mutation", 0, 0.00, "0%")
-
-counts_both
-
 
 counts_both$bluefeet_bluebeak_choice <- factor(counts_both$bluefeet_bluebeak_choice, 
-                                          levels = c("no mutation",
-                                                     "This duck has a Bk1 mutation (blue beak).",
-                                                     "Ft1",
-                                                     "This duck has a BkFt2 mutation (blue beak and blue feet).",
-                                                     "This duck has a Bk1 mutation (blue beak only) and a Ft1 mutation (blue feet only).",
-                                                     "This duck has BkFt2 mutation (blue beak and blue feet) and a Bk1 mutation (blue beak).",
-                                                     "This duck has a BkFt2 mutation (blue beak and blue feet) and Ft1 mutation (blue feet)."
+                                          levels = c("This duck has no mutation affecting beak and feet color.",
+                                                     "This duck has a TOX20 mutation (blue beak).",
+                                                     "This duck has a NAX20 mutation (blue feet).",
+                                                     "This duck has a PIX67 mutation (blue beak and blue feet).",
+                                                     "This duck has a TOX20 mutation (blue beak) and a NAX20 mutation (blue feet).",
+                                                     "This duck has PIX67 mutation (blue beak and blue feet) and a TOX20 mutation (blue beak).",
+                                                     "This duck has a PIX67 mutation (blue beak and blue feet) and NAX20 mutation (blue feet)."
                                                      ),
-                                          labels = c("no mutation", "Bk1", "Ft1", "BkFt2", "Bk1 + Ft1", "BkFt2 + Bk1", "BkFt2 + Ft1"))
+                                          labels = c("no mutation", "beak", "feet", "beak and feet", "beak + feet", "beak and feet + beak", "beak and feet + feet"))
 
 
 counts_both
@@ -763,10 +800,10 @@ g<- ggplot(plotdata,
   #coord_cartesian(xlim =c(1, 7), ylim = c(0, 1.1))+
   #coord_cartesian(clip = "off")+
   geom_text(aes(label = lbl), 
-            size = 5,
+            size = 4,
             position = position_dodge(width = 1),
             vjust = -1.5) +
-  scale_fill_manual(name = "Selected explan.",values=c("#66c2a5", "#e78ac3", "#e6ab02", "#8da0cb", "#a6d854", "#a65628", "#e41a1c"))+
+  scale_fill_manual(name = "Selected explanation",values=c("#66c2a5", "#e78ac3", "#e6ab02", "#8da0cb", "#a6d854", "#a65628", "#e41a1c"))+
   #scale_fill_brewer(palette = "Pastel1") +
   labs(y = "Percentage", 
        fill = "Explanatory preference",
@@ -785,6 +822,7 @@ g<- ggplot(plotdata,
 
 g
 
+#ggsave("selections_between.pdf",width=6,height=5)
 ggsave("categories_both.svg",width=7,height=4)
 ggsave("categories_both.pdf",width=7,height=4)
 ```

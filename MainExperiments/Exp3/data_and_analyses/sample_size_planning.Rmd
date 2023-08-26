@@ -1,0 +1,84 @@
+---
+title: "Sample Size Planning"
+output: html_document
+---
+
+# Calculating a plausible effect size
+
+1. Get an effect size that should be detected reliably (based on expected mean differences and what we know about the SD in this kind of study)
+
+
+```{r}
+library(pwr)
+pwr.t.test(d=(-0.2-(-0.5))/1.6,
+           power=0.8,
+           sig.level=0.05,
+           type="two.sample",
+           alternative="greater")
+```
+
+This yields $N~= 712$ ($n~= 356$), 89 in each of the 8 total conditions. This is the sample size if there was only one look at the data. 
+
+A small effect of $d~= 0.19$ can be detected with 80% power in a one-sided (directed) two-sample t test if the sample size is $N~= 712$.
+
+Note, however, that this sample is to small if a sequential testing strategy is applied. This is because of the Type-I error control in such an analysis, which leads to a reduction in test power. The final necessary total sample size will thus be conducted below.
+
+
+# Planning with Sequential Testing
+
+However, the present study aimed to employ a sequential testing strategy with one planned interim look after __70%__ of the final sample size.
+
+For more information, see [this website](https://lakens.github.io/statistical_inferences/10-sequential.html). 
+
+What are the critical p-values in this sequential analysis?
+
+```{r}
+library(rpact)
+design <- getDesignGroupSequential(
+  typeOfDesign = "asP", 
+  informationRates = c(0.7, 1), 
+  alpha = 0.05, 
+  sided = 1)
+design$stageLevels * 1
+```
+
+The critical (on-sided) p-value at the interim look is $.039$, and the critical p-value at the final look is $.0267$. 
+
+Since these p-value adjustments lead to p-values smaller than $0.05$ (the sig. value used in the initial power planning above), this leads to a (mild) reduction of statistical power. This can be compensated, however, by increasing the planned sample size accordingly. 
+
+This can be done this way:
+
+```{r}
+library(rpact)
+seq_design <- getDesignGroupSequential(
+  informationRates = c(0.7, 1), 
+  typeOfDesign = "asP",
+  sided = 1,
+  alpha = 0.05,
+  beta = 0.2
+  )
+
+# Compute the sample size we need
+power_res_seq <- getSampleSizeMeans(
+  design = seq_design,
+  groups = 2,
+  alternative = 0.1875, 
+  stDev = 1, 
+  allocationRatioPlanned = 1,
+  normalApproximation = FALSE)
+
+power_res_seq$maxNumberOfSubjects
+```
+To compensate for the power loss due to sequential testing with one interim look at $0.7N$, a total sample size of $N~= 789$ is needed. This was rounded to $N~= 800$ ($n~= 100$ per condition). 
+
+## Determine the N for the interim look
+
+Given this information, at what point (i.e., at what fraction of the total N of 800) must the interim look take place? 
+
+```{r}
+interim_N <- 0.7 * 800
+interim_N
+```
+Interim look takes place at $N~= 560$ ($n~= 70$ subjects in each of the 8 conditions)
+
+

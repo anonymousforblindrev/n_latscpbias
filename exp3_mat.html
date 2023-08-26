@@ -364,7 +364,7 @@ div.tocify {
   <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     <span class="glyphicon glyphicon-inbox"></span>
      
-    Supplementary Study
+    Supplementary and Pilot Studies
      
     <span class="caret"></span>
   </a>
@@ -372,6 +372,10 @@ div.tocify {
     <li class="dropdown-header">Summary of Supplementary Study</li>
     <li>
       <a href="expSup_mat.html">Supplementary Study</a>
+    </li>
+    <li class="dropdown-header">Summary of Pilot Study of Experiment 3</li>
+    <li>
+      <a href="exp3_pilot_mat.html">Pilot Study Exp. 3</a>
     </li>
   </ul>
 </li>
@@ -402,6 +406,11 @@ body {
 <h2><font style="color:lightgrey;"> Stimuli </font></h1>
 -->
 <p><br></p>
+<p>This site provides information about the main study. A pilot study
+that was conducted to pre-test the materials and to obtain a first
+impression of the effects that can be expected is summarized on a
+separate site (use the navigation bar above to reach the pilot
+study).</p>
 <hr />
 <div id="demo-version-of-experiment" class="section level1" number="1">
 <h1><span class="header-section-number">1</span> Demo Version of
@@ -419,13 +428,6 @@ href="MainExperiments/Exp3/experiment_files.zip">here</a>.</p>
 href="MainExperiments/Exp3/data_and_analyses/exp_data.zip">Download
 Experimental data</a> [.csv-file; delimiter = “,”]</li>
 </ul>
-<p>Please note: 200 subjects were tested in this experiment, but the
-data set contains 202 rows because two subjects happened to appear in
-two rows (i.e., they appeared twice in the data set), presumably due to
-a recording error. These are the subjects with subject codes
-(subj_code): “8R9V4veIAuw1” and “2lkGumre6eN4n”. In the analysis script
-that can be downloaded below, these duplicate entries are deleted in a
-first step.</p>
 <div id="data-set-information" class="section level2" number="2.1">
 <h2><span class="header-section-number">2.1</span> Data set
 information</h2>
@@ -437,6 +439,9 @@ information</h2>
 used</li>
 <li><strong>attent_conf</strong>: confirmation that subj. is willing to
 pay attention</li>
+<li><strong>prevalence</strong>: (main) experimental factor coding
+whether subjects did or did not receive information about the base rate
+of the unobserved feature</li>
 <li><strong>latent_feature</strong>: the latent feature in the test case
 (beak vs. feet)</li>
 <li><strong>LS_bias_probe_stim</strong>: the latent scope test pic
@@ -486,13 +491,6 @@ R-Markdown code</a></li>
 href="MainExperiments/Exp3/data_and_analyses/Exp_Analysis.html">View
 knitted/ compiled R-Markdown</a> (web view of analysis)</li>
 </ul>
-<p>Please note: 200 subjects were tested in this experiment, but the
-data set contains 202 rows because two subjects happened to appear in
-two rows (i.e., they appeared twice in the data set), presumably due to
-a recording error. These are the subjects with subject codes
-(subj_code): “8R9V4veIAuw1” and “2lkGumre6eN4n”. In the analysis script
-that can be downloaded above, these duplicate entries are deleted in a
-first step.</p>
 </div>
 <div id="analysis-of-subjects-explanations" class="section level1"
 number="4">
@@ -511,13 +509,24 @@ knitted/ compiled R-Markdown</a> (web view of analysis)</li>
 </ul>
 <p>Note: A .csv file containing all subject explanations is included in
 the folder that come with the R-Markdown code download.</p>
-<p>Please note: 200 subjects were tested in this experiment, but the
-data set contains 202 rows because two subjects happened to appear in
-two rows (i.e., they appeared twice in the data set), presumably due to
-a recording error. These are the subjects with subject codes
-(subj_code): “8R9V4veIAuw1” and “2lkGumre6eN4n”. In the analysis script
-of subjects’ explanations that can be downloaded above, these duplicate
-entries are deleted in a first step.</p>
+</div>
+<div id="study-planning" class="section level1" number="5">
+<h1><span class="header-section-number">5</span> Study planning</h1>
+<p>The study adopted a sequential testing strategy (for more information
+on sequential testing, see <a
+href="https://lakens.github.io/statistical_inferences/10-sequential.html">this
+website</a>).</p>
+<ul>
+<li><a
+href="MainExperiments/Exp3/data_and_analyses/sample_size_planning.Rmd">View
+R-Markdown code of study planning</a></li>
+<li><a
+href="MainExperiments/Exp3/data_and_analyses/sample_size_planning.zip">Download
+R-Markdown code of study planning</a></li>
+<li><a
+href="MainExperiments/Exp3/data_and_analyses/sample_size_planning.html">View
+knitted/ compiled R-Markdown</a></li>
+</ul>
 </div>
 
 <p><font size="-1.5">2023 ANONYMIZED AUTHOR.</font></p>

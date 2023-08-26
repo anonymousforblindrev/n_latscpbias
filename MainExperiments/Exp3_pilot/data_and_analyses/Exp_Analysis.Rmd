@@ -1,0 +1,792 @@
+---
+title: "Analysis"
+output:  
+  html_document:
+    number_sections: true
+    toc: true  
+    collapsed: false
+    toc_float: true
+    smooth_scroll: false
+    toc_depth: 3
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+# packages
+library(ez)
+library(reshape2)
+library(reshape)
+library(ggplot2)
+library(plyr)
+library(pastecs)
+library(ez)
+library(data.table)
+library(tidyverse) 
+
+library(showtext)
+library(readr)
+
+
+font_add_google("Poppins", "Poppins")
+font_add_google("Roboto Mono", "Roboto Mono")
+showtext_auto()
+```
+
+
+```{r}
+tdata <- read_csv("exp_data.csv")
+```
+
+
+
+```{r}
+# remove subject with duplicate entry
+tdata <- tdata %>% distinct(subj_code, .keep_all = TRUE)
+
+# Note that two rows appear twice, and the duplicates must be deleted
+```
+
+
+
+# Subject demographics
+
+```{r}
+# demographics 
+
+min(tdata$age)
+max(tdata$age)
+mean(tdata$age)
+sd(tdata$age)
+
+# 1 = male, 2 = female, 3 = other
+table(tdata$gender)
+```
+
+1 = male, 2 = female, 3 = non-binary, 4 = prefer not to say
+
+
+Check n in each condition:
+
+```{r}
+table(tdata$condition)
+```
+There are 4 conditions because we manipulated the latent feature (beak vs. feet) and counterbalanced the orientation of the rating scale (narrow left vs. narrow right)
+
+
+# Check mean and CI to estimate the bias
+
+```{r}
+# check width of the means 95% cis (is not supposed to be grater than 0.5)
+library(rcompanion)
+ci_table <- groupwiseMean(rating_rec ~ 1,
+              data        = tdata,
+              traditional = FALSE,
+              percentile  = TRUE)
+
+
+ci_table
+
+(ci_width <- ci_table$Percentile.upper - ci_table$Percentile.lower)
+```
+
+# Graphs and summaries
+
+## Rating distribution
+
+```{r}
+myTheme <- theme(plot.title = element_text(face="bold", size = 22),
+        axis.title.x = element_text(size = 20),
+        axis.title.y = element_text(size = 20),
+        axis.text.x = element_text(size = 14, angle = 0), 
+        axis.text.y = element_text(size = 16, angle = 0),
+        legend.text = element_text(size = 18),
+        legend.title = element_text(face = "bold", size = 18),
+        strip.text.x = element_text(size = 18),
+        #panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(), 
+        panel.background = element_blank(), 
+        axis.line.x = element_line(colour = "black"), 
+        axis.line.y = element_line(colour = "black"),
+        axis.text = element_text(colour ="black"), 
+        axis.ticks = element_line(colour ="black"))
+
+tdata_long <- tdata
+tdata_sub <- tdata_long
+
+
+library(see)
+## first, turn sID into a factor
+tdata_sub$subj_code <- factor(tdata_sub$subj_code)
+
+pd <- position_dodge(width = 0.3)
+
+tdata_sub$valueJitter <- jitter(tdata_sub$rating_rec, factor = 0.01, amount = 0.004)
+
+theme_set(theme_light(base_size = 20, base_family = "Poppins"))
+
+# new labes for the facets 
+
+g <- ggplot(tdata_sub, aes(x = 0.5, y = valueJitter)) +
+  guides(fill=FALSE)+
+  #facet_grid( ~ dv_query)+
+  #ggtitle("Subjects' causal srength ratings") +
+  scale_y_continuous(limits = c(-5.3, 5.3), breaks=seq(-5, 5, 1), expand = c(0,0)) +
+  #scale_x_discrete(labels=c("Probe")) +
+  #stat_summary(fun.y = mean, geom = "bar", position = "dodge", colour = "black", alpha =0.5) +
+  geom_violinhalf(aes(y = rating_rec, group = NA, fill = "#66c2a5"), color = NA, 
+                  position=position_dodge(1), alpha = 0.4)+
+  #geom_line(position = pd, color = "black", size = 1, alpha=0.04) +
+  geom_hline(yintercept=0, linetype="dashed", color = "black")+
+  geom_jitter(aes(color = "#66c2a5"), alpha = 0.5, width = 0.15, height = 0.3) +
+  stat_summary(aes(y = rating_rec, group=NA), fun.data = mean_cl_boot, 
+               geom = "errorbar", width = 0, size = 1) +
+  stat_summary(aes(y = rating_rec, group=1, fill = "#66c2a5"), fun.y=mean, geom="point", 
+               color = "black", shape = 22, size = 2, group=1, alpha = 1)+
+  stat_summary(aes(y = rating_rec,group=1), fun.y=median, geom="point", color = "black", shape = 3, size = 4, 
+               group=1, alpha = 1, position = position_dodge(width = 0.5))+
+  labs(x = "", y = "Explanation rating") +
+  scale_color_manual(name = "Strength",values=c("#66c2a5", "#e78ac3", "#8da0cb", "#a6d854"))+
+  scale_fill_manual(name = "Strength",values=c("#66c2a5", "#e78ac3", "#8da0cb", "#a6d854"))+
+  annotate("text", x = 0, y = 3.5, label = c("broad-scope"), angle = 90)+
+  annotate("text", x = 0, y = -3.5, label = c("narrow-scope"), angle = 90)+
+  theme(legend.position = "none")+
+  myTheme+
+   theme(panel.grid.major = element_line(color = "lightgrey",
+                                        size = 0.5,
+                                        linetype = 'dotted'),
+         axis.text.x = element_blank(),
+         axis.title.x = element_blank(),
+         axis.ticks.x = element_blank())+
+  stat_summary(aes(label=round(after_stat(y),2)), fun.y=mean, geom="text", size=5,
+             vjust = -8)
+g
+
+
+ggsave("results_means_mainDV.svg",width=5,height=5)
+ggsave("results_means_mainDV.pdf",width=5,height=5)
+```
+
+
+## Subject categories
+
+Get the values of the CIs shown in the plot:
+
+```{r}
+values <- ggplot_build(g)$data[[4]] # values are shown in the 4th panel 
+values
+```
+
+
+get group medians: 
+
+```{r}
+# groupwiseMean(rating_rec ~ Features + Knowledge,
+#               data        = tdata_long,
+#               traditional = FALSE,
+#               percentile  = TRUE)
+
+groupwiseMedian(rating_rec ~ 1,
+                data        = tdata_long,
+                bca         = FALSE,
+                percentile  = TRUE,
+                R           = 1000)
+```
+
+
+
+
+```{r}
+counts <- tdata_long %>%
+  group_by(rating_rec) %>%
+  summarize(n = n()) %>% 
+  mutate(pct = n/sum(n),
+         lbl = scales::percent(pct))
+
+counts
+# shows that 0 is the mode in all conditions
+```
+
+
+
+```{r}
+
+tdata_long$category[tdata_long$rating_rec < 0] <- "narrow"
+tdata_long$category[tdata_long$rating_rec == 0] <- "unbiased"
+tdata_long$category[tdata_long$rating_rec > 0] <- "broad"
+
+counts2 <- tdata_long %>%
+  group_by(category) %>%
+  summarize(n = n()) %>% 
+  mutate(pct = n/sum(n),
+         lbl = scales::percent(pct))
+
+counts2
+
+counts2$category <- factor(counts2$category, levels = c("unbiased", "narrow", "broad"), labels = c("unbiased", "narrow l.s.", "broad l.s."))
+
+```
+
+
+Get proportion CIs for the 3 categories
+
+```{r}
+library(PropCIs)
+library(DescTools)
+library(purrr)
+
+(MultinomCI(counts2$n,
+           conf.level=0.95,
+           method="sisonglaz") -> selection_ci)
+  
+
+ci_low <- c(selection_ci[,2])
+
+ci_up <- c(selection_ci[,3])
+```
+
+
+```{r}
+plotdata <- counts2
+
+plotdata$ci_low <- ci_low
+plotdata$ci_up <- ci_up
+```
+
+
+Plot:
+
+```{r}
+
+library(scales)
+theme_set(theme_light(base_size = 12, base_family = "Poppins"))
+
+g<- ggplot(plotdata, 
+       aes(x = category,
+           y = pct,
+           fill = "#66c2a5")) +
+  geom_bar(stat = "identity",
+           position = "dodge") +
+  scale_y_continuous(limits = seq(0, 2),
+                     breaks = seq(0, 1, .25),
+                     expand = c(0,0),
+                     label = percent) +
+  #coord_cartesian(xlim =c(1, 7), ylim = c(0, 1.1))+
+  #coord_cartesian(clip = "off")+
+  geom_text(aes(label = lbl), 
+            size = 3.5,
+            position = position_dodge(width = 1),
+            vjust = -3) +
+  scale_fill_manual(name = "Strength",values=c("#66c2a5", "#e78ac3", "#8da0cb", "#a6d854"))+
+  #scale_fill_brewer(palette = "Pastel1") +
+  labs(y = "Percentage", 
+       fill = "Explanatory preference",
+       x = "Explanatory preference")+
+  geom_pointrange(ymin = ci_low, ymax = ci_up, position = position_dodge(width = 0.89), shape = 22, size = 0.3)+
+  #annotate(geom = "hline",yintercept = 0.5, y = 0.5, color = "black", size = 1, linetype='dotted')+
+  #annotate("pointrange", x = plotdata$Transformation, y = plotdata$pct, 
+   #        ymin = plotdata$ci_low, 
+    #       ymax = plotdata$ci_up, 
+     #      colour = "black", size = 0.8, shape = 22, fill = Transformation, fatten = 1)+
+  #annotate("text", x = pvalues_x, y = Inf, label = pvalues, size = 4, vjust = 1.8)+
+  theme(legend.position = "none", axis.title = element_text(size = 20), axis.text = element_text(size = 11, color = "black"),
+        legend.text = element_text(size = 13),legend.title = element_text(size = 13))+
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
+
+g
+
+
+ggsave("categories.svg",width=5,height=5)
+ggsave("categories.pdf",width=5,height=5)
+```
+
+# Remaining results (additional test cases)
+
+Blue feet probe:
+
+```{r}
+counts_bluefeet <- tdata_long %>%
+  group_by(bluefeet_choice) %>%
+  summarize(n = n()) %>% 
+  mutate(pct = n/sum(n),
+         lbl = scales::percent(pct))
+
+counts_bluefeet
+
+# add the missing categories to the data frame (to have them in the plot later)
+
+#This duck has a Bk1 mutation (blue beak).
+counts_bluefeet[nrow(counts_bluefeet) + 1,] <- list("Bk1", 0, 0.00, "0%")
+
+# This duck has no mutation affecting beak and feet color.
+counts_bluefeet[nrow(counts_bluefeet) + 1,] <- list("no mutation", 0, 0.00, "0%")
+
+#This duck has a BkFt2 mutation (blue beak and blue feet) and Ft1 mutation (blue feet).
+counts_bluefeet[nrow(counts_bluefeet) + 1,] <- list("BkFt2 + Ft1", 0, 0.00, "0%")
+
+#This duck has BkFt2 mutation (blue beak and blue feet) and a Bk1 mutation (blue beak).
+counts_bluefeet[nrow(counts_bluefeet) + 1,] <- list("BkFt2 + Bk1", 0, 0.00, "0%")
+
+#This duck has a Bk1 mutation (blue beak only) and a Ft1 mutation (blue feet only).
+counts_bluefeet[nrow(counts_bluefeet) + 1,] <- list("Bk1 + Ft1", 0, 0.00, "0%")
+
+
+
+counts_bluefeet
+
+
+counts_bluefeet$bluefeet_choice <- factor(counts_bluefeet$bluefeet_choice, 
+                                          levels = c("no mutation",
+                                                     "Bk1",
+                                                     "This duck has a Ft1 mutation (blue feet).",
+                                                     "This duck has a BkFt2 mutation (blue beak and blue feet).",
+                                                     "Bk1 + Ft1",
+                                                     "BkFt2 + Bk1",
+                                                     "BkFt2 + Ft1"
+                                                     ),
+                                          labels = c("no mutation", "Bk1", "Ft1", "BkFt2", "Bk1 + Ft1", "BkFt2 + Bk1", "BkFt2 + Ft1"))
+
+
+```
+
+
+```{r}
+library(PropCIs)
+library(DescTools)
+library(purrr)
+
+(MultinomCI(counts_bluefeet$n,
+           conf.level=0.95,
+           method="sisonglaz") -> selection_ci)
+  
+
+ci_low <- c(selection_ci[,2])
+
+ci_up <- c(selection_ci[,3])
+```
+
+
+```{r}
+plotdata <- counts_bluefeet
+
+plotdata$ci_low <- ci_low
+plotdata$ci_up <- ci_up
+```
+
+
+Plot:
+
+```{r}
+
+library(scales)
+theme_set(theme_light(base_size = 12, base_family = "Poppins"))
+
+g<- ggplot(plotdata, 
+       aes(x = bluefeet_choice,
+           y = pct,
+           fill = bluefeet_choice)) +
+  geom_bar(stat = "identity",
+           position = "dodge") +
+  scale_y_continuous(limits = seq(0, 2),
+                     breaks = seq(0, 1, .25),
+                     expand = c(0,0),
+                     label = percent) +
+  #scale_x_discrete(labels=c("BkFt2", "Ft1")) +
+  #coord_cartesian(xlim =c(1, 7), ylim = c(0, 1.1))+
+  #coord_cartesian(clip = "off")+
+  geom_text(aes(label = lbl), 
+            size = 5,
+            position = position_dodge(width = 1),
+            vjust = -1.5) +
+  scale_fill_manual(name = "Selected explan.",values=c("#66c2a5", "#e78ac3", "#e6ab02", "#8da0cb", "#a6d854", "#a65628", "#e41a1c"))+
+  #scale_fill_brewer(palette = "Pastel1") +
+  labs(y = "Percentage", 
+       fill = "Explanatory preference",
+       x = "Explanatory preference")+
+  geom_pointrange(ymin = ci_low, ymax = ci_up, position = position_dodge(width = 0.89), shape = 22, size = 0.3)+
+  #annotate(geom = "hline",yintercept = 0.5, y = 0.5, color = "black", size = 1, linetype='dotted')+
+  #annotate("pointrange", x = plotdata$Transformation, y = plotdata$pct, 
+   #        ymin = plotdata$ci_low, 
+    #       ymax = plotdata$ci_up, 
+     #      colour = "black", size = 0.8, shape = 22, fill = Transformation, fatten = 1)+
+  #annotate("text", x = pvalues_x, y = Inf, label = pvalues, size = 4, vjust = 1.8)+
+  theme(legend.position = "right", axis.title = element_blank(), axis.text.y = element_text(size = 14, color = "black"),
+        axis.text.x = element_blank(),
+        legend.text = element_text(size = 13),legend.title = element_text(size = 13))+
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.title.x = element_blank())
+
+g
+
+
+ggsave("categories_bluefeet.svg",width=7,height=4)
+ggsave("categories_bluefeet.pdf",width=7,height=4)
+```
+
+
+
+
+
+Blue beak probe: 
+
+
+```{r}
+counts_bluebeak <- tdata_long %>%
+  group_by(bluebeak_choice) %>%
+  summarize(n = n()) %>% 
+  mutate(pct = n/sum(n),
+         lbl = scales::percent(pct, accuracy = 0.1))
+
+counts_bluebeak
+
+
+
+# add the missing categories to the data frame (to have them in the plot later)
+
+
+counts_bluebeak[nrow(counts_bluebeak) + 1,] <- list("BkFt2", 0, 0.00, "0%")
+
+
+counts_bluebeak[nrow(counts_bluebeak) + 1,] <- list("no mutation", 0, 0.00, "0%")
+
+
+counts_bluebeak[nrow(counts_bluebeak) + 1,] <- list("BkFt2 + Ft1", 0, 0.00, "0%")
+
+
+counts_bluebeak[nrow(counts_bluebeak) + 1,] <- list("BkFt2 + Bk1", 0, 0.00, "0%")
+
+
+counts_bluebeak[nrow(counts_bluebeak) + 1,] <- list("Bk1 + Ft1", 0, 0.00, "0%")
+
+
+
+counts_bluebeak
+
+
+counts_bluebeak$bluebeak_choice <- factor(counts_bluebeak$bluebeak_choice, 
+                                          levels = c("no mutation",
+                                                     "This duck has a Bk1 mutation (blue beak).",
+                                                     "This duck has a Ft1 mutation (blue feet).",
+                                                     "BkFt2",
+                                                     "Bk1 + Ft1",
+                                                     "BkFt2 + Bk1",
+                                                     "BkFt2 + Ft1"
+                                                     ),
+                                          labels = c("no mutation", "Bk1", "Ft1", "BkFt2", "Bk1 + Ft1", "BkFt2 + Bk1", "BkFt2 + Ft1"))
+
+
+```
+
+
+```{r}
+library(PropCIs)
+library(DescTools)
+library(purrr)
+
+(MultinomCI(counts_bluebeak$n,
+           conf.level=0.95,
+           method="sisonglaz") -> selection_ci)
+  
+
+ci_low <- c(selection_ci[,2])
+
+ci_up <- c(selection_ci[,3])
+```
+
+
+```{r}
+plotdata <- counts_bluebeak
+
+plotdata$ci_low <- ci_low
+plotdata$ci_up <- ci_up
+```
+
+
+Plot:
+
+```{r}
+
+library(scales)
+theme_set(theme_light(base_size = 12, base_family = "Poppins"))
+
+g<- ggplot(plotdata, 
+       aes(x = bluebeak_choice,
+           y = pct,
+           fill = bluebeak_choice)) +
+  geom_bar(stat = "identity",
+           position = "dodge") +
+  scale_y_continuous(limits = seq(0, 2),
+                     breaks = seq(0, 1, .25),
+                     expand = c(0,0),
+                     label = percent) +
+  #scale_x_discrete(labels=c("Bk1", "Ft1")) +
+  #coord_cartesian(xlim =c(1, 7), ylim = c(0, 1.1))+
+  #coord_cartesian(clip = "off")+
+  geom_text(aes(label = lbl), 
+            size = 5,
+            position = position_dodge(width = 1),
+            vjust = -1.5) +
+  scale_fill_manual(name = "Selected explan.",values=c("#66c2a5", "#e78ac3", "#e6ab02", "#8da0cb", "#a6d854", "#a65628", "#e41a1c"))+
+  #scale_fill_brewer(palette = "Pastel1") +
+  labs(y = "Percentage", 
+       fill = "Explanatory preference",
+       x = "Explanatory preference")+
+  geom_pointrange(ymin = ci_low, ymax = ci_up, position = position_dodge(width = 0.89), shape = 22, size = 0.3)+
+  #annotate(geom = "hline",yintercept = 0.5, y = 0.5, color = "black", size = 1, linetype='dotted')+
+  #annotate("pointrange", x = plotdata$Transformation, y = plotdata$pct, 
+   #        ymin = plotdata$ci_low, 
+    #       ymax = plotdata$ci_up, 
+     #      colour = "black", size = 0.8, shape = 22, fill = Transformation, fatten = 1)+
+  #annotate("text", x = pvalues_x, y = Inf, label = pvalues, size = 4, vjust = 1.8)+
+  theme(legend.position = "right", axis.title = element_blank(), axis.text.y = element_text(size = 14, color = "black"),
+        axis.text.x = element_blank(),
+        legend.text = element_text(size = 13),legend.title = element_text(size = 13))+
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.title.x = element_blank())
+
+g
+
+ggsave("categories_bluebeak.svg",width=7,height=4)
+ggsave("categories_bluebeak.pdf",width=7,height=4)
+```
+
+
+
+
+
+
+typical duck probe: 
+
+
+```{r}
+counts_typical <- tdata_long %>%
+  group_by(typical_choice) %>%
+  summarize(n = n()) %>% 
+  mutate(pct = n/sum(n),
+         lbl = scales::percent(pct))
+
+counts_typical
+
+
+# add the missing categories to the data frame (to have them in the plot later)
+
+
+counts_typical[nrow(counts_typical) + 1,] <- list("BkFt2", 0, 0.00, "0%")
+
+
+counts_typical[nrow(counts_typical) + 1,] <- list("Bk1", 0, 0.00, "0%")
+
+
+counts_typical[nrow(counts_typical) + 1,] <- list("Ft1", 0, 0.00, "0%")
+
+
+counts_typical[nrow(counts_typical) + 1,] <- list("BkFt2 + Ft1", 0, 0.00, "0%")
+
+
+counts_typical[nrow(counts_typical) + 1,] <- list("BkFt2 + Bk1", 0, 0.00, "0%")
+
+
+counts_typical[nrow(counts_typical) + 1,] <- list("Bk1 + Ft1", 0, 0.00, "0%")
+
+
+
+counts_typical
+
+
+counts_typical$typical_choice <- factor(counts_typical$typical_choice, 
+                                          levels = c("This duck has no mutation affecting beak and feet color.",
+                                                     "Bk1",
+                                                     "Ft1",
+                                                     "BkFt2",
+                                                     "Bk1 + Ft1",
+                                                     "BkFt2 + Bk1",
+                                                     "BkFt2 + Ft1"
+                                                     ),
+                                          labels = c("no mutation", "Bk1", "Ft1", "BkFt2", "Bk1 + Ft1", "BkFt2 + Bk1", "BkFt2 + Ft1"))
+
+
+counts_typical
+```
+
+
+```{r}
+library(PropCIs)
+library(DescTools)
+library(purrr)
+
+(MultinomCI(counts_typical$n,
+           conf.level=0.95,
+           method="sisonglaz") -> selection_ci)
+  
+
+ci_low <- c(selection_ci[,2])
+
+ci_up <- c(selection_ci[,3])
+```
+
+
+```{r}
+plotdata <- counts_typical
+
+plotdata$ci_low <- ci_low
+plotdata$ci_up <- ci_up
+```
+
+
+Plot:
+
+```{r}
+
+library(scales)
+theme_set(theme_light(base_size = 12, base_family = "Poppins"))
+
+g<- ggplot(plotdata, 
+       aes(x = typical_choice,
+           y = pct,
+           fill = typical_choice)) +
+  geom_bar(stat = "identity",
+           position = "dodge") +
+  scale_y_continuous(limits = seq(0, 2),
+                     breaks = seq(0, 1, .25),
+                     expand = c(0,0),
+                     label = percent) +
+  #scale_x_discrete(labels=c("No mutation")) +
+  #coord_cartesian(xlim =c(1, 7), ylim = c(0, 1.1))+
+  #coord_cartesian(clip = "off")+
+  geom_text(aes(label = lbl), 
+            size = 5,
+            position = position_dodge(width = 1),
+            vjust = -1.5) +
+  scale_fill_manual(name = "Selected explan.",values=c("#66c2a5", "#e78ac3", "#e6ab02", "#8da0cb", "#a6d854", "#a65628", "#e41a1c"))+
+  #scale_fill_brewer(palette = "Pastel1") +
+  labs(y = "Percentage", 
+       fill = "Explanatory preference",
+       x = "Explanatory preference")+
+  geom_pointrange(ymin = ci_low, ymax = ci_up, position = position_dodge(width = 0.89), shape = 22, size = 0.3)+
+  #annotate(geom = "hline",yintercept = 0.5, y = 0.5, color = "black", size = 1, linetype='dotted')+
+  #annotate("pointrange", x = plotdata$Transformation, y = plotdata$pct, 
+   #        ymin = plotdata$ci_low, 
+    #       ymax = plotdata$ci_up, 
+     #      colour = "black", size = 0.8, shape = 22, fill = Transformation, fatten = 1)+
+  #annotate("text", x = pvalues_x, y = Inf, label = pvalues, size = 4, vjust = 1.8)+
+  theme(legend.position = "right", axis.title = element_blank(), axis.text.y = element_text(size = 14, color = "black"),
+        axis.text.x = element_blank(),
+        legend.text = element_text(size = 13),legend.title = element_text(size = 13))+
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.title.x = element_blank())
+
+g
+
+
+ggsave("categories_typical.svg",width=7,height=4)
+ggsave("categories_typical.pdf",width=7,height=4)
+```
+
+
+
+
+
+
+```{r}
+counts_both <- tdata_long %>%
+  group_by(bluefeet_bluebeak_choice) %>%
+  summarize(n = n()) %>% 
+  mutate(pct = n/sum(n),
+         lbl = scales::percent(pct))
+
+counts_both 
+
+counts_both[nrow(counts_both) + 1,] <- list("Ft1", 0, 0.00, "0%")
+
+
+counts_both[nrow(counts_both) + 1,] <- list("no mutation", 0, 0.00, "0%")
+
+counts_both
+
+
+counts_both$bluefeet_bluebeak_choice <- factor(counts_both$bluefeet_bluebeak_choice, 
+                                          levels = c("no mutation",
+                                                     "This duck has a Bk1 mutation (blue beak).",
+                                                     "Ft1",
+                                                     "This duck has a BkFt2 mutation (blue beak and blue feet).",
+                                                     "This duck has a Bk1 mutation (blue beak only) and a Ft1 mutation (blue feet only).",
+                                                     "This duck has BkFt2 mutation (blue beak and blue feet) and a Bk1 mutation (blue beak).",
+                                                     "This duck has a BkFt2 mutation (blue beak and blue feet) and Ft1 mutation (blue feet)."
+                                                     ),
+                                          labels = c("no mutation", "Bk1", "Ft1", "BkFt2", "Bk1 + Ft1", "BkFt2 + Bk1", "BkFt2 + Ft1"))
+
+
+counts_both
+
+
+```
+
+
+```{r}
+library(PropCIs)
+library(DescTools)
+library(purrr)
+
+(MultinomCI(counts_both$n,
+           conf.level=0.95,
+           method="sisonglaz") -> selection_ci)
+  
+
+ci_low <- c(selection_ci[,2])
+
+ci_up <- c(selection_ci[,3])
+```
+
+
+```{r}
+plotdata <- counts_both
+
+plotdata$ci_low <- ci_low
+plotdata$ci_up <- ci_up
+```
+
+
+Plot:
+
+```{r}
+
+library(scales)
+theme_set(theme_light(base_size = 12, base_family = "Poppins"))
+
+g<- ggplot(plotdata, 
+       aes(x = bluefeet_bluebeak_choice,
+           y = pct,
+           fill = bluefeet_bluebeak_choice)) +
+  geom_bar(stat = "identity",
+           position = "dodge") +
+  scale_y_continuous(limits = seq(0, 2),
+                     breaks = seq(0, 1, .25),
+                     expand = c(0,0),
+                     label = percent) +
+  #scale_x_discrete(labels=c("BkFt2", "Bk1 + Ft1", "Bk1", "BkFt2 + Ft1", "BkFt2")) +
+  #coord_cartesian(xlim =c(1, 7), ylim = c(0, 1.1))+
+  #coord_cartesian(clip = "off")+
+  geom_text(aes(label = lbl), 
+            size = 5,
+            position = position_dodge(width = 1),
+            vjust = -1.5) +
+  scale_fill_manual(name = "Selected explan.",values=c("#66c2a5", "#e78ac3", "#e6ab02", "#8da0cb", "#a6d854", "#a65628", "#e41a1c"))+
+  #scale_fill_brewer(palette = "Pastel1") +
+  labs(y = "Percentage", 
+       fill = "Explanatory preference",
+       x = "Explanatory preference")+
+  geom_pointrange(ymin = ci_low, ymax = ci_up, position = position_dodge(width = 0.89), shape = 22, size = 0.3)+
+  #annotate(geom = "hline",yintercept = 0.5, y = 0.5, color = "black", size = 1, linetype='dotted')+
+  #annotate("pointrange", x = plotdata$Transformation, y = plotdata$pct, 
+   #        ymin = plotdata$ci_low, 
+    #       ymax = plotdata$ci_up, 
+     #      colour = "black", size = 0.8, shape = 22, fill = Transformation, fatten = 1)+
+  #annotate("text", x = pvalues_x, y = Inf, label = pvalues, size = 4, vjust = 1.8)+
+  theme(legend.position = "right", axis.title = element_blank(), axis.text.y = element_text(size = 14, color = "black"),
+        axis.text.x = element_blank(),
+        legend.text = element_text(size = 13),legend.title = element_text(size = 13))+
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.title.x = element_blank())
+
+g
+
+ggsave("categories_both.svg",width=7,height=4)
+ggsave("categories_both.pdf",width=7,height=4)
+```
+
+

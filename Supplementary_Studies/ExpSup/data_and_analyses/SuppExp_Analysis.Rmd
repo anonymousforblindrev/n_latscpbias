@@ -175,6 +175,23 @@ values
 ```
 
 
+```{r}
+library(rcompanion)
+
+
+ci_table <- groupwiseMean(rating_rec ~ source,
+              data        = tdata_long,
+              traditional = FALSE,
+              percentile  = TRUE)
+
+
+ci_table
+(ci_width <- ci_table$Percentile.upper - ci_table$Percentile.lower)
+
+
+```
+
+
 get group medians: 
 
 ```{r}
