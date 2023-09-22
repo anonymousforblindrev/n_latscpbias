@@ -409,11 +409,15 @@ Plot:
 library(scales)
 theme_set(theme_light(base_size = 12, base_family = "Poppins"))
 
+# new labels for the facets 
+query.labs <- c("test question: \nis most probable", "test question: \nis most satisfying", "test question: \nwould be most satisfying")
+names(query.labs) <- c("is most \nprobable", "is most \nsatisfying", "would be \nmost satisfying")
+
 g<- ggplot(plotdata, 
        aes(x = category,
            y = pct,
            fill = dv_query)) +
-  facet_grid(~ dv_query)+
+  facet_grid(~ dv_query, labeller = labeller(dv_query = query.labs))+
   geom_bar(stat = "identity",
            position = "dodge") +
   scale_y_continuous(limits = seq(0, 2),

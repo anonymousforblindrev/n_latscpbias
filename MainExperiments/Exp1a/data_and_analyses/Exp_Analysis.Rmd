@@ -96,7 +96,7 @@ tdata_long$Knowledge <- Knowledge
 
 table(tdata_long$Features, tdata_long$Knowledge)
 
-tdata_long$Features <- factor(tdata_long$Features, levels = c("spearNet", "featherTooth"), labels = c("Spear and net", "Feathers and tooth"))
+tdata_long$Features <- factor(tdata_long$Features, levels = c("spearNet", "featherTooth"), labels = c("feature diagnosability: \nboth similar", "feature diagnosability: \nlatent feature harder"))
 
 tdata_long$Knowledge <- factor(tdata_long$Knowledge, levels = c("notKnow", "noInfo"), labels = c("'you don't know'", "no information"))
 
@@ -135,9 +135,9 @@ library(PropCIs)
 library(DescTools)
 library(purrr)
 
-counts_spear <- subset(counts, Features == "Spear and net")
+counts_spear <- subset(counts, Features == "feature diagnosability: \nboth similar")
 
-counts_feather <- subset(counts, Features == "Feathers and tooth")
+counts_feather <- subset(counts, Features == "feature diagnosability: \nlatent feature harder")
 
 
 (MultinomCI(counts_spear$n,
@@ -271,11 +271,11 @@ library(PropCIs)
 library(DescTools)
 library(purrr)
 
-counts_dontknow_spear <- subset(counts, Knowledge == "'you don't know'" & Features == "Spear and net")
-counts_dontknow_feather <- subset(counts, Knowledge == "'you don't know'" & Features == "Feathers and tooth")
+counts_dontknow_spear <- subset(counts, Knowledge == "'you don't know'" & Features == "feature diagnosability: \nboth similar")
+counts_dontknow_feather <- subset(counts, Knowledge == "'you don't know'" & Features == "feature diagnosability: \nlatent feature harder")
 
-counts_noinf_spear <- subset(counts, Knowledge == "no information" & Features == "Spear and net")
-counts_noinf_feather <- subset(counts, Knowledge == "no information" & Features == "Feathers and tooth")
+counts_noinf_spear <- subset(counts, Knowledge == "no information" & Features == "feature diagnosability: \nboth similar")
+counts_noinf_feather <- subset(counts, Knowledge == "no information" & Features == "feature diagnosability: \nlatent feature harder")
 
 
 (MultinomCI(counts_dontknow_spear$n,

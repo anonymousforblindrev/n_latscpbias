@@ -97,7 +97,7 @@ tdata_long$Knowledge <- Knowledge
 
 table(tdata_long$Features, tdata_long$Knowledge)
 
-tdata_long$Features <- factor(tdata_long$Features, levels = c("spearNet", "featherTooth"), labels = c("Spear and net", "Feathers and tooth"))
+tdata_long$Features <- factor(tdata_long$Features, levels = c("spearNet", "featherTooth"), labels = c("feature diagnosability: \nboth similar", "feature diagnosability: \nlatent feature harder"))
 
 tdata_long$Knowledge <- factor(tdata_long$Knowledge, levels = c("notKnow", "noInfo"), labels = c("'you don't know'", "no information"))
 
@@ -150,7 +150,7 @@ g <- ggplot(tdata_sub, aes(x = Features, y = valueJitter)) +
   #facet_grid( ~ Knowledge)+
   #ggtitle("Subjects' causal srength ratings") +
   scale_y_continuous(limits = c(-5.3, 5.3), breaks=seq(-5, 5, 1), expand = c(0,0)) +
-  scale_x_discrete(labels=c("Spear and \nnet", "Feathers and \ntooth")) +
+  scale_x_discrete(labels=c("both \nsimilar", "latent feature \nharder")) +
   #stat_summary(fun.y = mean, geom = "bar", position = "dodge", colour = "black", alpha =0.5) +
   geom_violinhalf(aes(y = rating_rec, group = Features, fill = Features), color = NA, 
                   position=position_dodge(1), alpha = 0.4)+
@@ -165,7 +165,7 @@ g <- ggplot(tdata_sub, aes(x = Features, y = valueJitter)) +
                color = "black", shape = 22, size = 2, group=1, alpha = 1)+
   stat_summary(aes(y = rating_rec,group=1), fun.y=median, geom="point", color = "black", shape = 3, size = 4, 
                group=1, alpha = 1, position = position_dodge(width = 0.5))+
-  labs(x = "Category Features", y = "Categorization Rating") +
+  labs(x = "Feature diagnosability", y = "Explanation Rating") +
   scale_color_manual(name = "Strength",values=c("#66c2a5", "#e78ac3", "#8da0cb", "#a6d854"))+
   scale_fill_manual(name = "Strength",values=c("#66c2a5", "#e78ac3", "#8da0cb", "#a6d854"))+
   annotate("text", x = 0.5, y = 3.5, label = c("broad-scope"), angle = 90)+
@@ -193,7 +193,7 @@ g2 <- ggplot(tdata_sub, aes(x = rating_rec, y = Features, fill = after_stat(x)))
    #stat_summary(aes(x = rating_rec), fun.x=mean, geom="point", 
   #             color = "black", shape = 22, size = 2, group=1, alpha = 1)+
   scale_fill_viridis_c(name = "Explanation \nRating", option = "C")+
-  labs(x = "Rating", y = "Category Features") +
+  labs(x = "Rating", y = "Feature diagnosability") +
   myTheme
 
 g2
@@ -264,9 +264,9 @@ library(PropCIs)
 library(DescTools)
 library(purrr)
 
-counts_spear <- subset(counts2, Features == "Spear and net")
+counts_spear <- subset(counts2, Features == "feature diagnosability: \nboth similar")
 
-counts_feather <- subset(counts2, Features == "Feathers and tooth")
+counts_feather <- subset(counts2, Features == "feature diagnosability: \nlatent feature harder")
 
 
 (MultinomCI(counts_spear$n,
@@ -381,7 +381,7 @@ t.test(rating_rec ~ Features, data = tdata_main, var.equal = F, alternative = "t
 
 ### Proportion tests for behavior categories 
 
-Test if proportion of unbiased subjects is higher in feathe_tooth vs. spear_net
+Test if proportion of unbiased subjects is higher in "latent feature harder" than in "feature diagnosability: \nboth similar"
 
 ```{r}
 unbiased_props <- prop.test(x = c(counts2$n[3], counts2$n[4]), n = c(50, 50), alternative = "less", correct = F)
@@ -447,7 +447,7 @@ g <- ggplot(tdata_sub, aes(x = Features, y = valueJitter)) +
   facet_grid( ~ Knowledge)+
   #ggtitle("Subjects' causal srength ratings") +
   scale_y_continuous(limits = c(-5.3, 5.3), breaks=seq(-5, 5, 1), expand = c(0,0)) +
-  scale_x_discrete(labels=c("Spear and \nnet", "Feather and \ntooth")) +
+  scale_x_discrete(labels=c("feature diagnosability: \nboth similar", "feature diagnosability: \nlatent feature harder")) +
   #stat_summary(fun.y = mean, geom = "bar", position = "dodge", colour = "black", alpha =0.5) +
   geom_violinhalf(aes(y = rating_rec, group = Features, fill = Features), color = NA, 
                   position=position_dodge(1), alpha = 0.4)+
@@ -554,11 +554,11 @@ library(PropCIs)
 library(DescTools)
 library(purrr)
 
-counts_spear_notknow <- subset(counts2, Features == "Spear and net" & Knowledge == "'you don't know'")
-counts_spear_noinf <- subset(counts2, Features == "Spear and net" & Knowledge == "no information")
+counts_spear_notknow <- subset(counts2, Features == "feature diagnosability: \nboth similar" & Knowledge == "'you don't know'")
+counts_spear_noinf <- subset(counts2, Features == "feature diagnosability: \nboth similar" & Knowledge == "no information")
 
-counts_feather_notknow <- subset(counts2, Features == "Feathers and tooth" & Knowledge == "'you don't know'")
-counts_feather_noinf <- subset(counts2, Features == "Feathers and tooth" & Knowledge == "no information")
+counts_feather_notknow <- subset(counts2, Features == "feature diagnosability: \nlatent feature harder" & Knowledge == "'you don't know'")
+counts_feather_noinf <- subset(counts2, Features == "feature diagnosability: \nlatent feature harder" & Knowledge == "no information")
 
 
 (MultinomCI(counts_spear_notknow$n,
@@ -692,7 +692,7 @@ First, create an object that contains the results of the previous (forced-choice
 
 ```{r}
 Study <- c(rep("Forced",4))
-Features <- c("Spear and net", "Spear and net", "Feathers and tooth", "Feathers and tooth")
+Features <- c("feature diagnosability: \nboth similar", "feature diagnosability: \nboth similar", "feature diagnosability: \nlatent feature harder", "feature diagnosability: \nlatent feature harder")
 category <- c("narrow l.s.", "broad l.s.", "narrow l.s.", "broad l.s.") # note that "unbiased" is actually not a reasonable category here as subjects had to choose one explanation (this was included here only for the sake of comparability with the continuous scale experiment)
 
 n <- c(32,8,37,3)

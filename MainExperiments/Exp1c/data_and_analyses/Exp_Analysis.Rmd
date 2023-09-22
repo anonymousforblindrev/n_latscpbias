@@ -88,7 +88,7 @@ tdata_long <- rbind(dat_narrow_left, dat_narrow_right)
 
 tdata_long$Story <- factor(tdata_long$Story, levels = c("daisy", "stamp", "watch"), labels = c("Daisy", "Stamp", "Watch"))
 
-tdata_long$LatentF <- factor(tdata_long$LatentF, levels = c("visible", "invisible"), labels = c("both \nsimilar", "latent feature \nharder"))
+tdata_long$LatentF <- factor(tdata_long$LatentF, levels = c("visible", "invisible"), labels = c("feature diagnosability: \nboth similar", "feature diagnosability: \nlatent feature harder"))
 
 ```
 
@@ -175,7 +175,7 @@ g <- ggplot(tdata_sub, aes(x = LatentF, y = valueJitter)) +
   facet_grid( ~ Story)+
   #ggtitle("Subjects' causal srength ratings") +
   scale_y_continuous(limits = c(-5.3, 5.3), breaks=seq(-5, 5, 1), expand = c(0,0)) +
-  #scale_x_discrete(labels=c("Spear and \nnet", "Feather and \ntooth")) +
+  scale_x_discrete(labels=c("both \nsimilar", "latent feature \nharder")) +
   #stat_summary(fun.y = mean, geom = "bar", position = "dodge", colour = "black", alpha =0.5) +
   geom_violinhalf(aes(y = rating_rec, group = LatentF, fill = LatentF), color = NA, 
                   position=position_dodge(1), alpha = 0.4)+
@@ -247,7 +247,7 @@ g <- ggplot(tdata_sub, aes(x = LatentF, y = valueJitter)) +
   #facet_grid( ~ Story)+
   #ggtitle("Subjects' causal srength ratings") +
   scale_y_continuous(limits = c(-5.3, 5.3), breaks=seq(-5, 5, 1), expand = c(0,0)) +
-  #scale_x_discrete(labels=c("Spear and \nnet", "Feather and \ntooth")) +
+  scale_x_discrete(labels=c("both \nsimilar", "latent feature \nharder")) +
   #stat_summary(fun.y = mean, geom = "bar", position = "dodge", colour = "black", alpha =0.5) +
   geom_violinhalf(aes(y = rating_rec, group = LatentF, fill = LatentF), color = NA, 
                   position=position_dodge(1), alpha = 0.4)+
@@ -262,7 +262,7 @@ g <- ggplot(tdata_sub, aes(x = LatentF, y = valueJitter)) +
                color = "black", shape = 22, size = 2, group=1, alpha = 1)+
   stat_summary(aes(y = rating_rec,group=1), fun.y=median, geom="point", color = "black", shape = 3, size = 4, 
                group=1, alpha = 1, position = position_dodge(width = 0.5))+
-  labs(x = "Relative Feature Diagnosability", y = "Categorization Rating") +
+  labs(x = "Feature diagnosability", y = "Categorization Rating") +
   scale_color_manual(name = "Strength",values=c("#66c2a5", "#e78ac3", "#8da0cb", "#a6d854"))+
   scale_fill_manual(name = "Strength",values=c("#66c2a5", "#e78ac3", "#8da0cb", "#a6d854"))+
   annotate("text", x = 0.5, y = 3.5, label = c("broad-scope"), angle = 90)+
@@ -347,8 +347,8 @@ library(PropCIs)
 library(DescTools)
 library(purrr)
 
-counts_visible <- subset(counts2, LatentF == "both \nsimilar")
-counts_invisible <- subset(counts2, LatentF == "latent feature \nharder")
+counts_visible <- subset(counts2, LatentF == "feature diagnosability: \nboth similar")
+counts_invisible <- subset(counts2, LatentF == "feature diagnosability: \nlatent feature harder")
 
 
 (MultinomCI(counts_visible$n,

@@ -98,6 +98,7 @@ myTheme <- theme(plot.title = element_text(face="bold", size = 22),
         legend.text = element_text(size = 18),
         legend.title = element_text(face = "bold", size = 18),
         strip.text.x = element_text(size = 18),
+        strip.text.y = element_text(size = 18),
         #panel.grid.major = element_blank(), 
         panel.grid.minor = element_blank(), 
         panel.background = element_blank(), 
@@ -120,11 +121,14 @@ tdata_sub$valueJitter <- jitter(tdata_sub$rating_rec, factor = 0.01, amount = 0.
 
 theme_set(theme_light(base_size = 20, base_family = "Poppins"))
 
-# new labes for the facets 
+# new labels for the facets 
+query.labs <- c("test question: probability", "test question: satisfaction")
+names(query.labs) <- c("probability", "satisfaction")
+
 
 g <- ggplot(tdata_sub, aes(x = outcome_valence, y = valueJitter)) +
-  guides(fill=FALSE)+
-  facet_grid( ~ dv_query)+
+  #guides(fill=FALSE)+
+  facet_grid( ~ dv_query, labeller = labeller(dv_query = query.labs))+
   #ggtitle("Subjects' causal srength ratings") +
   scale_y_continuous(limits = c(-5.3, 5.3), breaks=seq(-5, 5, 1), expand = c(0,0)) +
   #scale_x_discrete(labels=c("no \ninformation", "'You don't \nknow'")) +
@@ -157,8 +161,8 @@ g <- ggplot(tdata_sub, aes(x = outcome_valence, y = valueJitter)) +
 g
 
 
-ggsave("results_means_mainDV.svg",width=7,height=5)
-ggsave("results_means_mainDV.pdf",width=7,height=5)
+ggsave("results_means_mainDV.svg",width=8,height=5)
+ggsave("results_means_mainDV.pdf",width=8,height=5)
 ```
 
 ```{r}
@@ -260,11 +264,11 @@ counts_sat_pos <- subset(counts2, dv_query == "satisfaction" & outcome_valence =
   
 (MultinomCI(counts_sat_neg$n,
            conf.level=0.95,
-           method="sisonglaz") -> selection_ci_2)
+           method="sisonglaz") -> selection_ci_3)
 
 (MultinomCI(counts_prob_pos$n,
            conf.level=0.95,
-           method="sisonglaz") -> selection_ci_3)
+           method="sisonglaz") -> selection_ci_2)
 
 (MultinomCI(counts_sat_pos$n,
            conf.level=0.95,
@@ -294,15 +298,24 @@ Plot:
 ```{r}
 
 library(scales)
-theme_set(theme_light(base_size = 12, base_family = "Poppins"))
+theme_set(theme_light(base_size = 13, base_family = "Poppins"))
 
 library(grid)
+
+# new labels for the facets 
+query.labs <- c("test question: probability", "test question: satisfaction")
+names(query.labs) <- c("probability", "satisfaction")
+
+# new labels for the facets 
+valence.labs <- c("feature valence: negative", "feature valence: positive")
+names(valence.labs) <- c("negative", "positive")
+
 
 g<- ggplot(plotdata, 
        aes(x = category,
            y = pct,
            fill = outcome_valence)) +
-  facet_grid(outcome_valence ~ dv_query)+
+  facet_grid(dv_query ~ outcome_valence, labeller = labeller(outcome_valence = valence.labs, dv_query = query.labs))+
   geom_bar(stat = "identity",
            position = "dodge") +
   scale_y_continuous(limits = seq(0, 1.2),
@@ -328,7 +341,7 @@ g<- ggplot(plotdata,
      #      colour = "black", size = 0.8, shape = 22, fill = Transformation, fatten = 1)+
   #annotate("text", x = pvalues_x, y = Inf, label = pvalues, size = 4, vjust = 1.8)+
   theme(legend.position = "none", axis.title = element_text(size = 20), axis.text = element_text(size = 13, color = "black"),
-        legend.text = element_text(size = 13),legend.title = element_text(size = 13),strip.text.x = element_text(size = 13))+
+        legend.text = element_text(size = 13),legend.title = element_text(size = 13),strip.text = element_text(size = 13))+
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
   theme(panel.spacing.y = unit(1, "lines"))
 

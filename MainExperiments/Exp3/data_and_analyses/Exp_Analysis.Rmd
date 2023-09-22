@@ -333,11 +333,16 @@ Plot:
 library(scales)
 theme_set(theme_light(base_size = 12, base_family = "Poppins"))
 
+# new labels for the facets 
+rates.labs <- c("feature rate information: \nomitted", "feature rate information: \npresented")
+names(rates.labs) <- c("omitted", "presented")
+
+
 g<- ggplot(plotdata, 
        aes(x = category,
            y = pct,
            fill = prevalence)) +
-  facet_grid( ~ prevalence)+
+  facet_grid( ~ prevalence, labeller = labeller(prevalence = rates.labs))+
   geom_bar(stat = "identity",
            position = "dodge") +
   scale_y_continuous(limits = seq(0, 2),
@@ -349,7 +354,7 @@ g<- ggplot(plotdata,
   geom_text(aes(label = lbl), 
             size = 4,
             position = position_dodge(width = 1),
-            vjust = -3) +
+            vjust = -2.6) +
   scale_fill_manual(name = "Strength",values=c("#66c2a5", "#e78ac3", "#8da0cb", "#a6d854"))+
   #scale_fill_brewer(palette = "Pastel1") +
   labs(y = "Percentage", 
@@ -411,7 +416,11 @@ counts_bluefeet$bluefeet_choice <- factor(counts_bluefeet$bluefeet_choice,
                                                      "This duck has PIX67 mutation (blue beak and blue feet) and a TOX20 mutation (blue beak).",
                                                      "This duck has a PIX67 mutation (blue beak and blue feet) and NAX20 mutation (blue feet)."
                                                      ),
-                                          labels = c("no mutation", "beak", "feet", "beak and feet", "beak + feet", "beak and feet + beak", "beak and feet + feet"))
+                                          labels = c("no mutation", "mutation affecting \nonly beak", "mutation affecting \nonly feet",
+                                                     "mutation affecting \nbeak and feet", 
+                                                     "mutation affecting \nonly beak + \nmutation affecting \nonly feet", 
+                                                     "mutation affecting \nbeak and feet + \nmutation affecting \nonly beak",
+                                                     "mutation affecting \nbeak and feet + \nmutation affecting \nonly feet"))
 
 
 ```
@@ -479,14 +488,15 @@ g<- ggplot(plotdata,
   #annotate("text", x = pvalues_x, y = Inf, label = pvalues, size = 4, vjust = 1.8)+
   theme(legend.position = "right", axis.title = element_blank(), axis.text.y = element_text(size = 14, color = "black"),
         axis.text.x = element_blank(),
-        legend.text = element_text(size = 13),legend.title = element_text(size = 13))+
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.title.x = element_blank())
+        legend.text = element_text(size = 12),legend.title = element_text(size = 13), legend.spacing.y = unit(0.3, 'cm'))+
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.title.x = element_blank())+
+    guides(fill = guide_legend(byrow = TRUE))
 
 g
 
 #ggsave("selections_between.pdf",width=6,height=5)
-ggsave("categories_bluefeet.svg",width=7,height=4)
-ggsave("categories_bluefeet.pdf",width=7,height=4)
+ggsave("categories_bluefeet.svg",width=8,height=5)
+ggsave("categories_bluefeet.pdf",width=8,height=5)
 ```
 
 
@@ -527,7 +537,11 @@ counts_bluebeak$bluebeak_choice <- factor(counts_bluebeak$bluebeak_choice,
                                                      "This duck has PIX67 mutation (blue beak and blue feet) and a TOX20 mutation (blue beak).",
                                                      "This duck has a PIX67 mutation (blue beak and blue feet) and NAX20 mutation (blue feet)."
                                                      ),
-                                          labels = c("no mutation", "beak", "feet", "beak and feet", "beak + feet", "beak and feet + beak", "beak and feet + feet"))
+                                          labels = c("no mutation", "mutation affecting \nonly beak", "mutation affecting \nonly feet",
+                                                     "mutation affecting \nbeak and feet", 
+                                                     "mutation affecting \nonly beak + \nmutation affecting \nonly feet", 
+                                                     "mutation affecting \nbeak and feet + \nmutation affecting \nonly beak",
+                                                     "mutation affecting \nbeak and feet + \nmutation affecting \nonly feet"))
 
 
 ```
@@ -595,14 +609,15 @@ g<- ggplot(plotdata,
   #annotate("text", x = pvalues_x, y = Inf, label = pvalues, size = 4, vjust = 1.8)+
   theme(legend.position = "right", axis.title = element_blank(), axis.text.y = element_text(size = 14, color = "black"),
         axis.text.x = element_blank(),
-        legend.text = element_text(size = 13),legend.title = element_text(size = 13))+
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.title.x = element_blank())
+        legend.text = element_text(size = 12),legend.title = element_text(size = 13), legend.spacing.y = unit(0.3, 'cm'))+
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.title.x = element_blank())+
+    guides(fill = guide_legend(byrow = TRUE))
 
 g
 
 #ggsave("selections_between.pdf",width=6,height=5)
-ggsave("categories_bluebeak.svg",width=7,height=4)
-ggsave("categories_bluebeak.pdf",width=7,height=4)
+ggsave("categories_bluebeak.svg",width=8,height=5)
+ggsave("categories_bluebeak.pdf",width=8,height=5)
 ```
 
 
@@ -643,7 +658,11 @@ counts_typical$typical_choice <- factor(counts_typical$typical_choice,
                                                      "This duck has PIX67 mutation (blue beak and blue feet) and a TOX20 mutation (blue beak).",
                                                      "This duck has a PIX67 mutation (blue beak and blue feet) and NAX20 mutation (blue feet)."
                                                      ),
-                                          labels = c("no mutation", "beak", "feet", "beak and feet", "beak + feet", "beak and feet + beak", "beak and feet + feet"))
+                                          labels = c("no mutation", "mutation affecting \nonly beak", "mutation affecting \nonly feet",
+                                                     "mutation affecting \nbeak and feet", 
+                                                     "mutation affecting \nonly beak + \nmutation affecting \nonly feet", 
+                                                     "mutation affecting \nbeak and feet + \nmutation affecting \nonly beak",
+                                                     "mutation affecting \nbeak and feet + \nmutation affecting \nonly feet"))
 
 
 counts_typical
@@ -712,14 +731,15 @@ g<- ggplot(plotdata,
   #annotate("text", x = pvalues_x, y = Inf, label = pvalues, size = 4, vjust = 1.8)+
   theme(legend.position = "right", axis.title = element_blank(), axis.text.y = element_text(size = 14, color = "black"),
         axis.text.x = element_blank(),
-        legend.text = element_text(size = 13),legend.title = element_text(size = 13))+
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.title.x = element_blank())
+        legend.text = element_text(size = 12),legend.title = element_text(size = 13), legend.spacing.y = unit(0.3, 'cm'))+
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.title.x = element_blank())+
+    guides(fill = guide_legend(byrow = TRUE))
 
 g
 
 #ggsave("selections_between.pdf",width=6,height=5)
-ggsave("categories_typical.svg",width=7,height=4)
-ggsave("categories_typical.pdf",width=7,height=4)
+ggsave("categories_typical.svg",width=8,height=5)
+ggsave("categories_typical.pdf",width=8,height=5)
 ```
 
 
@@ -746,7 +766,11 @@ counts_both$bluefeet_bluebeak_choice <- factor(counts_both$bluefeet_bluebeak_cho
                                                      "This duck has PIX67 mutation (blue beak and blue feet) and a TOX20 mutation (blue beak).",
                                                      "This duck has a PIX67 mutation (blue beak and blue feet) and NAX20 mutation (blue feet)."
                                                      ),
-                                          labels = c("no mutation", "beak", "feet", "beak and feet", "beak + feet", "beak and feet + beak", "beak and feet + feet"))
+                                          labels = c("no mutation", "mutation affecting \nonly beak", "mutation affecting \nonly feet",
+                                                     "mutation affecting \nbeak and feet", 
+                                                     "mutation affecting \nonly beak + \nmutation affecting \nonly feet", 
+                                                     "mutation affecting \nbeak and feet + \nmutation affecting \nonly beak",
+                                                     "mutation affecting \nbeak and feet + \nmutation affecting \nonly feet"))
 
 
 counts_both
@@ -817,14 +841,15 @@ g<- ggplot(plotdata,
   #annotate("text", x = pvalues_x, y = Inf, label = pvalues, size = 4, vjust = 1.8)+
   theme(legend.position = "right", axis.title = element_blank(), axis.text.y = element_text(size = 14, color = "black"),
         axis.text.x = element_blank(),
-        legend.text = element_text(size = 13),legend.title = element_text(size = 13))+
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.title.x = element_blank())
+        legend.text = element_text(size = 12),legend.title = element_text(size = 13), legend.spacing.y = unit(0.3, 'cm'))+
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.title.x = element_blank())+
+    guides(fill = guide_legend(byrow = TRUE))
 
 g
 
 #ggsave("selections_between.pdf",width=6,height=5)
-ggsave("categories_both.svg",width=7,height=4)
-ggsave("categories_both.pdf",width=7,height=4)
+ggsave("categories_both.svg",width=8,height=5)
+ggsave("categories_both.pdf",width=8,height=5)
 ```
 
 
